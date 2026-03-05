@@ -52,10 +52,10 @@
 
 - [x] **VAL-01**: Compactness evaluator checks SKILL.md is under 500 lines
 - [x] **VAL-02**: Syntax evaluator extracts code blocks and runs them through `ast.parse` to catch syntax errors
-- [ ] **VAL-03**: API Accuracy evaluator (Opus, LLM-as-judge) verifies every endpoint, class name, and CLI flag exists exactly in the organized research
-- [ ] **VAL-04**: Completeness evaluator (Opus, LLM-as-judge) verifies all canonical use cases have worked examples and all dependencies have installation commands
-- [ ] **VAL-05**: Trigger Quality evaluator (Opus, LLM-as-judge) verifies the trigger description is specific, pushy, and covers all reference trigger phrases
-- [ ] **VAL-06**: Evaluators return structured scores; any score below 7 triggers feedback routing to production
+- [x] **VAL-03**: API Accuracy evaluator (Opus, LLM-as-judge) verifies every endpoint, class name, and CLI flag exists exactly in the organized research
+- [x] **VAL-04**: Completeness evaluator (Opus, LLM-as-judge) verifies all canonical use cases have worked examples and all dependencies have installation commands
+- [x] **VAL-05**: Trigger Quality evaluator (Opus, LLM-as-judge) verifies the trigger description is specific, pushy, and covers all reference trigger phrases
+- [x] **VAL-06**: Evaluators return structured scores; any score below 7 triggers feedback routing to production
 
 ### Observability
 
@@ -136,10 +136,10 @@
 | PROD-05 | Phase 3 | Complete |
 | VAL-01 | Phase 3 | Complete |
 | VAL-02 | Phase 3 | Complete |
-| VAL-03 | Phase 3 | Pending |
-| VAL-04 | Phase 3 | Pending |
-| VAL-05 | Phase 3 | Pending |
-| VAL-06 | Phase 3 | Pending |
+| VAL-03 | Phase 3 | Complete |
+| VAL-04 | Phase 3 | Complete |
+| VAL-05 | Phase 3 | Complete |
+| VAL-06 | Phase 3 | Complete |
 | OBS-01 | Phase 1 | Complete |
 | OBS-02 | Phase 1 | Complete |
 | OBS-03 | Phase 1 | Complete |
