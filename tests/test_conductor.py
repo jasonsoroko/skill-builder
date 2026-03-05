@@ -740,6 +740,73 @@ class TestFocusedKwargsDispatch:
         assert "failed_dimensions" not in call_kwargs
 
 
+class TestProgressIntegration:
+    """Test that Conductor integrates with PipelineProgress."""
+
+    def test_conductor_accepts_progress_none(
+        self, brief: SkillBrief, store: CheckpointStore, budget: TokenBudget, stub_agents: dict
+    ) -> None:
+        """Conductor works fine with progress=None (default)."""
+        conductor = Conductor(
+            brief=brief, store=store, budget=budget, agents=stub_agents, progress=None
+        )
+        result = conductor.run()
+        assert result.phase == PipelinePhase.COMPLETE
+
+    def test_conductor_calls_progress_phase_start(
+        self, brief: SkillBrief, store: CheckpointStore, budget: TokenBudget, stub_agents: dict
+    ) -> None:
+        """When progress is provided, phase_start is called for each phase."""
+        from unittest.mock import MagicMock
+
+        mock_progress = MagicMock()
+        mock_progress.verbose = False
+
+        conductor = Conductor(
+            brief=brief, store=store, budget=budget,
+            agents=stub_agents, progress=mock_progress
+        )
+        conductor.run()
+
+        assert mock_progress.phase_start.call_count >= 9  # at least 9 phases
+        assert mock_progress.phase_complete.call_count >= 9
+
+    def test_conductor_calls_eval_score_after_validation(
+        self, brief: SkillBrief, store: CheckpointStore, budget: TokenBudget, stub_agents: dict
+    ) -> None:
+        """After VALIDATING phase, progress.eval_score is called for each dimension."""
+        from unittest.mock import MagicMock
+
+        mock_progress = MagicMock()
+        mock_progress.verbose = False
+
+        conductor = Conductor(
+            brief=brief, store=store, budget=budget,
+            agents=stub_agents, progress=mock_progress
+        )
+        conductor.run()
+
+        # StubValidatorAgent returns 3 dimensions
+        assert mock_progress.eval_score.call_count >= 3
+
+    def test_conductor_calls_budget_display_when_verbose(
+        self, brief: SkillBrief, store: CheckpointStore, budget: TokenBudget, stub_agents: dict
+    ) -> None:
+        """When progress.verbose is True, budget_display is called at phase boundaries."""
+        from unittest.mock import MagicMock
+
+        mock_progress = MagicMock()
+        mock_progress.verbose = True
+
+        conductor = Conductor(
+            brief=brief, store=store, budget=budget,
+            agents=stub_agents, progress=mock_progress
+        )
+        conductor.run()
+
+        assert mock_progress.budget_display.call_count >= 1
+
+
 class TestDefaultAgents:
     """Test that _default_agents returns correct agent types."""
 
@@ -771,11 +838,19 @@ class TestDefaultAgents:
         assert isinstance(agents["documenter"], DocumenterAgent)
         assert isinstance(agents["validator"], ValidatorAgent)
 
+    def test_real_packager_agent(self) -> None:
+        """_default_agents uses real PackagerAgent."""
+        from skill_builder.agents.packager import PackagerAgent
+        from skill_builder.conductor import _default_agents
+
+        agents = _default_agents()
+
+        assert isinstance(agents["packager"], PackagerAgent)
+
     def test_stub_agents_for_remaining(self) -> None:
-        """_default_agents uses stubs for intake and packager (not yet implemented)."""
+        """_default_agents uses stubs for intake (not yet implemented)."""
         from skill_builder.conductor import _default_agents
 
         agents = _default_agents()
 
         assert isinstance(agents["intake"], StubIntakeAgent)
-        assert isinstance(agents["packager"], StubPackagerAgent)

@@ -12,7 +12,10 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from skill_builder.progress import PipelineProgress
 
 from skill_builder.agents.documenter import DocumenterAgent
 from skill_builder.agents.gap_analyzer import GapAnalyzerAgent
@@ -20,10 +23,8 @@ from skill_builder.agents.harvest import HarvestAgent
 from skill_builder.agents.learner import LearnerAgent
 from skill_builder.agents.mapper import MapperAgent
 from skill_builder.agents.organizer import OrganizerAgent
-from skill_builder.agents.stubs import (
-    StubIntakeAgent,
-    StubPackagerAgent,
-)
+from skill_builder.agents.packager import PackagerAgent
+from skill_builder.agents.stubs import StubIntakeAgent
 from skill_builder.agents.validator import ValidatorAgent
 from skill_builder.budget import TokenBudget
 from skill_builder.checkpoint import CheckpointStore
@@ -42,8 +43,8 @@ def _default_agents() -> dict[str, Any]:
     """Create the default agent set.
 
     Phase 2 agents (harvest, organizer, gap_analyzer, learner) use real implementations.
-    Phase 3 agents (mapper, documenter, validator) use real implementations.
-    Intake and packager still use stubs until implemented.
+    Phase 3 agents (mapper, documenter, validator, packager) use real implementations.
+    Only intake still uses a stub until implemented.
     """
     return {
         "intake": StubIntakeAgent(),
@@ -54,7 +55,7 @@ def _default_agents() -> dict[str, Any]:
         "mapper": MapperAgent(),
         "documenter": DocumenterAgent(),
         "validator": ValidatorAgent(),
-        "packager": StubPackagerAgent(),
+        "packager": PackagerAgent(),
     }
 
 
@@ -112,11 +113,13 @@ class Conductor:
         store: CheckpointStore,
         budget: TokenBudget,
         agents: dict[str, Any] | None = None,
+        progress: PipelineProgress | None = None,
     ) -> None:
         self.brief = brief
         self.store = store
         self.budget = budget
         self.agents = agents if agents is not None else _default_agents()
+        self.progress = progress
 
     def run(self, state: PipelineState | None = None) -> PipelineState:
         """Run the pipeline from the given state (or fresh start).
@@ -166,10 +169,15 @@ class Conductor:
                     self.budget.budget_usd,
                     state.phase,
                 )
-                print(
-                    f"  [budget] Exceeded (${self.budget.total_cost_usd:.2f}"
-                    f" / ${self.budget.budget_usd:.2f}). Halting."
-                )
+                if self.progress:
+                    self.progress.budget_display(
+                        self.budget.total_cost_usd, self.budget.budget_usd
+                    )
+                else:
+                    print(
+                        f"  [budget] Exceeded (${self.budget.total_cost_usd:.2f}"
+                        f" / ${self.budget.budget_usd:.2f}). Halting."
+                    )
                 return state
 
         return state
@@ -197,7 +205,10 @@ class Conductor:
             return state
 
         phase_label = phase.value
-        print(f"  [{phase_label}] Starting...")
+        if self.progress:
+            self.progress.phase_start(phase_label, agent_key)
+        else:
+            print(f"  [{phase_label}] Starting...")
         start = time.monotonic()
 
         kwargs = self._build_kwargs(phase, state)
@@ -207,7 +218,23 @@ class Conductor:
         # Store result in state based on phase
         self._store_result(phase, state, result)
 
-        print(f"  [{phase_label}] Complete ({elapsed:.1f}s)")
+        if self.progress:
+            self.progress.phase_complete(phase_label, elapsed)
+        else:
+            print(f"  [{phase_label}] Complete ({elapsed:.1f}s)")
+
+        # Display eval scores after validation
+        if phase == PipelinePhase.VALIDATING and self.progress:
+            dumped = result.model_dump() if hasattr(result, "model_dump") else result
+            for dim in dumped.get("dimensions", []):
+                self.progress.eval_score(dim["name"], dim["score"], dim["passed"])
+
+        # Display budget at phase boundaries when verbose
+        if self.progress and self.progress.verbose:
+            self.progress.budget_display(
+                self.budget.total_cost_usd, self.budget.budget_usd
+            )
+
         return state
 
     def _build_kwargs(
@@ -327,7 +354,8 @@ class Conductor:
         elif phase == PipelinePhase.RE_PRODUCING:
             state.skill_draft = dumped
         elif phase == PipelinePhase.PACKAGING:
-            pass  # Package output path is in the result
+            state.package_path = dumped.get("package_path")
+            state.verification_instructions = dumped.get("verification_instructions")
 
     def _next_phase(
         self, current: PipelinePhase, state: PipelineState

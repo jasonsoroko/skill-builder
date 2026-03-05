@@ -1,7 +1,7 @@
 """Pipeline agents for skill-builder.
 
 Re-exports real agent implementations for Phase 2 and Phase 3 agents,
-plus stub agents for intake and packager (not yet implemented).
+plus stub agents for intake (not yet implemented).
 """
 
 from skill_builder.agents.documenter import DocumenterAgent
@@ -10,6 +10,7 @@ from skill_builder.agents.harvest import HarvestAgent
 from skill_builder.agents.learner import LearnerAgent
 from skill_builder.agents.mapper import MapperAgent
 from skill_builder.agents.organizer import OrganizerAgent
+from skill_builder.agents.packager import PackagerAgent
 from skill_builder.agents.stubs import (
     StubDocumenterAgent,
     StubGapAnalyzerAgent,
@@ -32,6 +33,7 @@ __all__ = [
     # Real Phase 3 agents
     "DocumenterAgent",
     "MapperAgent",
+    "PackagerAgent",
     "ValidatorAgent",
     # Stub agents (for testing and unimplemented phases)
     "StubDocumenterAgent",

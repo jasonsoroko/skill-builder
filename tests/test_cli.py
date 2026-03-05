@@ -103,9 +103,10 @@ class TestBasicInvocation:
         monkeypatch.chdir(tmp_path)
 
         result = runner.invoke(build, [str(brief_file)])
-        assert result.exit_code == 0
-        # Should contain at least some phase banners
-        assert "[intake]" in result.output.lower() or "Starting" in result.output
+        assert result.exit_code == 0, f"Output: {result.output}\nException: {result.exception}"
+        # Should contain at least some phase banners (Rich or plain text)
+        output = result.output.lower()
+        assert "intake" in output or "starting" in output or "complete" in output
 
 
 class TestDryRun:
@@ -238,6 +239,21 @@ class TestVerbose:
         # Verbose should have more output than non-verbose
         # At minimum, it should show phase transitions
         assert len(result.output) > 0
+
+
+class TestRichSummary:
+    """Test Rich summary panel in CLI output."""
+
+    def test_build_shows_summary_on_complete(
+        self, runner: CliRunner, brief_file: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Successful build shows a summary panel with Build Complete."""
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(build, [str(brief_file)])
+        assert result.exit_code == 0, f"Output: {result.output}\nException: {result.exception}"
+        output = result.output.lower()
+        assert "build complete" in output or "complete" in output
 
 
 class TestMissingFile:

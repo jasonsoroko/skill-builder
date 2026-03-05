@@ -57,6 +57,8 @@ class PipelineState(BaseModel):
     skill_draft: dict | None = None  # type: ignore[type-arg]
     setup_draft: dict | None = None  # type: ignore[type-arg]
     evaluation_results: list[dict] = Field(default_factory=list)  # type: ignore[type-arg]
+    package_path: str | None = None
+    verification_instructions: str | None = None
 
     # Loop counters
     gap_loop_count: int = 0

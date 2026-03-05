@@ -1,8 +1,8 @@
 """Click CLI entry point for skill-builder.
 
-Provides the `skill-builder build` command that drives stub agents (Phase 1)
-through the full pipeline with checkpoint persistence, resume capability,
-budget enforcement, and dry-run mode.
+Provides the `skill-builder build` command that drives agents through the full
+pipeline with checkpoint persistence, resume capability, budget enforcement,
+Rich progress display, and dry-run mode.
 
 Usage:
     skill-builder build brief.json [--dry-run] [--resume] [--verbose] [--budget N] [--force]
@@ -11,6 +11,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
 
 import click
@@ -20,6 +21,7 @@ from skill_builder.checkpoint import CheckpointStore
 from skill_builder.conductor import Conductor
 from skill_builder.models.brief import SkillBrief
 from skill_builder.models.state import PipelinePhase, PipelineState
+from skill_builder.progress import PipelineProgress
 
 # Default state directory (relative to CWD)
 _STATE_DIR = Path(".skill-builder") / "state"
@@ -92,26 +94,42 @@ def build(
         _print_dry_run(skill_brief, token_budget)
         return
 
-    # 7. Create Conductor and run
+    # 7. Create PipelineProgress and Conductor
+    progress = PipelineProgress(verbose=verbose)
+
     conductor = Conductor(
         brief=skill_brief,
         store=store,
         budget=token_budget,
+        progress=progress,
     )
 
     if verbose:
         click.echo(f"  Budget: ${budget:.2f}")
         click.echo("")
 
+    pipeline_start = time.monotonic()
     result = conductor.run(state=state)
+    pipeline_elapsed = time.monotonic() - pipeline_start
 
     # 8. Print completion summary
     click.echo("")
     if result.phase == PipelinePhase.COMPLETE:
-        click.echo(f"  Build complete: {brief_name}")
-        click.echo(
-            f"  Cost: ${result.total_cost_usd:.4f}"
-            f" (budget: ${budget:.2f})"
+        # Extract evaluation dimensions from last evaluation result
+        eval_dimensions: list[dict] = []  # type: ignore[type-arg]
+        if result.evaluation_results:
+            last_eval = result.evaluation_results[-1]
+            eval_dimensions = last_eval.get("dimensions", [])
+
+        # Show Rich summary panel
+        progress.summary_panel(
+            total_time=pipeline_elapsed,
+            total_cost=result.total_cost_usd,
+            eval_dimensions=eval_dimensions,
+            gap_loops=result.gap_loop_count,
+            validation_loops=result.validation_loop_count,
+            output_path=result.package_path or brief_name,
+            verification_instructions=result.verification_instructions or "",
         )
     elif result.phase == PipelinePhase.FAILED:
         click.echo(f"  Build failed: {brief_name}")
