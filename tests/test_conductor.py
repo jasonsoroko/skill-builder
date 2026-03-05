@@ -807,6 +807,120 @@ class TestProgressIntegration:
         assert mock_progress.budget_display.call_count >= 1
 
 
+class TestBudgetRecording:
+    """Test that conductor extracts _usage_meta and calls budget.record_usage()."""
+
+    def test_usage_meta_calls_budget_record(
+        self, brief: SkillBrief, store: CheckpointStore
+    ) -> None:
+        """When agent result has _usage_meta, conductor calls budget.record_usage()."""
+        from unittest.mock import MagicMock
+
+        # Create a stub agent whose result has _usage_meta
+        class UsageTrackingOrganizer:
+            def run(self, **kwargs):
+                result = StubOrganizerAgent().run()
+                result._usage_meta = {  # type: ignore[attr-defined]
+                    "model": "claude-sonnet-4-6",
+                    "input_tokens": 1000,
+                    "output_tokens": 500,
+                }
+                return result
+
+        agents = {
+            "intake": StubIntakeAgent(),
+            "harvest": StubHarvestAgent(),
+            "organizer": UsageTrackingOrganizer(),
+            "gap_analyzer": StubGapAnalyzerAgent(),
+            "learner": StubLearnerAgent(),
+            "mapper": StubMapperAgent(),
+            "documenter": StubDocumenterAgent(),
+            "validator": StubValidatorAgent(),
+            "packager": StubPackagerAgent(),
+        }
+        budget = TokenBudget(budget_usd=1000.0)
+
+        conductor = Conductor(brief=brief, store=store, budget=budget, agents=agents)
+
+        state = PipelineState(
+            brief_name="test-skill",
+            phase=PipelinePhase.ORGANIZING,
+            raw_harvest={"pages": [], "total_pages": 0},
+        )
+        conductor._run_phase(PipelinePhase.ORGANIZING, state)
+
+        # Budget should have recorded the usage
+        assert budget.total_input_tokens == 1000
+        assert budget.total_output_tokens == 500
+        assert budget.total_cost_usd > 0
+
+    def test_budget_halt_after_recording_exceeds_cap(
+        self, brief: SkillBrief, store: CheckpointStore
+    ) -> None:
+        """When budget.exceeded becomes True after recording, conductor halts pipeline."""
+        # Create an agent that pushes budget past cap via _usage_meta
+        class ExpensiveIntake:
+            def run(self, **kwargs):
+                result = StubIntakeAgent().run()
+                result._usage_meta = {  # type: ignore[attr-defined]
+                    "model": "claude-sonnet-4-6",
+                    "input_tokens": 10_000_000,  # Very large to exceed budget
+                    "output_tokens": 5_000_000,
+                }
+                return result
+
+        agents = {
+            "intake": ExpensiveIntake(),
+            "harvest": StubHarvestAgent(),
+            "organizer": StubOrganizerAgent(),
+            "gap_analyzer": StubGapAnalyzerAgent(),
+            "learner": StubLearnerAgent(),
+            "mapper": StubMapperAgent(),
+            "documenter": StubDocumenterAgent(),
+            "validator": StubValidatorAgent(),
+            "packager": StubPackagerAgent(),
+        }
+        budget = TokenBudget(budget_usd=0.01)  # Very low budget
+
+        conductor = Conductor(brief=brief, store=store, budget=budget, agents=agents)
+        result = conductor.run()
+
+        # Pipeline should halt (not reach COMPLETE)
+        assert result.phase != PipelinePhase.COMPLETE
+        assert budget.exceeded is True
+
+    def test_no_usage_meta_skips_recording(
+        self, brief: SkillBrief, store: CheckpointStore
+    ) -> None:
+        """When agent result has no _usage_meta, budget.record_usage() is NOT called."""
+        agents = {
+            "intake": StubIntakeAgent(),
+            "harvest": StubHarvestAgent(),
+            "organizer": StubOrganizerAgent(),
+            "gap_analyzer": StubGapAnalyzerAgent(),
+            "learner": StubLearnerAgent(),
+            "mapper": StubMapperAgent(),
+            "documenter": StubDocumenterAgent(),
+            "validator": StubValidatorAgent(),
+            "packager": StubPackagerAgent(),
+        }
+        budget = TokenBudget(budget_usd=1000.0)
+
+        conductor = Conductor(brief=brief, store=store, budget=budget, agents=agents)
+        result = conductor.run()
+
+        # Stub agents don't have _usage_meta, so budget should remain at 0
+        assert budget.total_input_tokens == 0
+        assert budget.total_output_tokens == 0
+        assert budget.total_cost_usd == 0.0
+        assert result.phase == PipelinePhase.COMPLETE
+
+    def test_packager_result_has_no_usage_meta(self) -> None:
+        """PackagerAgent result does NOT have _usage_meta (no LLM calls)."""
+        result = StubPackagerAgent().run()
+        assert not hasattr(result, "_usage_meta")
+
+
 class TestDefaultAgents:
     """Test that _default_agents returns correct agent types."""
 
