@@ -5,10 +5,7 @@ Per RES-02: LangSmith errors never block the pipeline.
 
 from __future__ import annotations
 
-import logging
-from unittest.mock import MagicMock, patch
-
-import anthropic
+from unittest.mock import patch
 
 
 class TestCreateTracedClient:
@@ -27,7 +24,10 @@ class TestCreateTracedClient:
         from skill_builder.tracing import create_traced_client
 
         # Simulate LangSmith being unavailable by patching wrap_anthropic to fail
-        with patch("skill_builder.tracing._try_wrap_anthropic", side_effect=Exception("LangSmith unavailable")):
+        with patch(
+            "skill_builder.tracing._try_wrap_anthropic",
+            side_effect=Exception("LangSmith unavailable"),
+        ):
             client = create_traced_client()
             assert client is not None
 
@@ -35,10 +35,13 @@ class TestCreateTracedClient:
         """create_traced_client() suppresses LangSmith errors and logs a warning."""
         from skill_builder.tracing import create_traced_client
 
-        with patch("skill_builder.tracing._try_wrap_anthropic", side_effect=RuntimeError("LangSmith crashed")):
-            with logging.captureWarnings(True):
-                client = create_traced_client()
-                assert client is not None
+        with patch(
+            "skill_builder.tracing._try_wrap_anthropic",
+            side_effect=RuntimeError("LangSmith crashed"),
+        ):
+            # Should not raise -- LangSmith errors are suppressed
+            client = create_traced_client()
+            assert client is not None
 
 
 class TestTraceableAgent:
