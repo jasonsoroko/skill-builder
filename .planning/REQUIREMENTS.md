@@ -16,7 +16,7 @@
 - [x] **CORE-07**: Dry-run mode prints fetch plan and estimated API cost, then exits
 - [x] **CORE-08**: Global token budget cap prevents runaway costs in feedback loops
 - [x] **CORE-09**: CLI entry point via Click accepts brief file path and options (dry-run, resume, verbose)
-- [ ] **CORE-10**: Rich CLI progress output shows current phase, agent activity, and completion status
+- [x] **CORE-10**: Rich CLI progress output shows current phase, agent activity, and completion status
 
 ### Content Harvest
 
@@ -65,9 +65,9 @@
 
 ### Packaging
 
-- [ ] **PKG-01**: Packager assembles output folder: SKILL.md, references/, scripts/, assets/, LICENSE.txt (MIT)
-- [ ] **PKG-02**: Packager produces `.skill` file based on `deploy_target` (repo, user, or package)
-- [ ] **PKG-03**: Pipeline prints installation verification instructions after packaging
+- [x] **PKG-01**: Packager assembles output folder: SKILL.md, references/, scripts/, assets/, LICENSE.txt (MIT)
+- [x] **PKG-02**: Packager produces `.skill` file based on `deploy_target` (repo, user, or package)
+- [x] **PKG-03**: Pipeline prints installation verification instructions after packaging
 
 ### Resilience
 
@@ -112,7 +112,7 @@
 | CORE-07 | Phase 1 | Complete |
 | CORE-08 | Phase 1 | Complete |
 | CORE-09 | Phase 1 | Complete |
-| CORE-10 | Phase 3 | Pending |
+| CORE-10 | Phase 3 | Complete |
 | HARV-01 | Phase 2 | Complete |
 | HARV-02 | Phase 2 | Complete |
 | HARV-03 | Phase 2 | Complete |
@@ -143,9 +143,9 @@
 | OBS-01 | Phase 1 | Complete |
 | OBS-02 | Phase 1 | Complete |
 | OBS-03 | Phase 1 | Complete |
-| PKG-01 | Phase 3 | Pending |
-| PKG-02 | Phase 3 | Pending |
-| PKG-03 | Phase 3 | Pending |
+| PKG-01 | Phase 3 | Complete |
+| PKG-02 | Phase 3 | Complete |
+| PKG-03 | Phase 3 | Complete |
 | RES-01 | Phase 1 | Complete |
 | RES-02 | Phase 1 | Complete |
 | RES-03 | Phase 1 | Complete |
