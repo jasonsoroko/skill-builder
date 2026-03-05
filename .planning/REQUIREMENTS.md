@@ -42,16 +42,16 @@
 
 ### Production
 
-- [ ] **PROD-01**: Mapper agent (Sonnet) translates KnowledgeModel into a draft SKILL.md under 500 lines
-- [ ] **PROD-02**: SKILL.md includes YAML frontmatter with a specific, pushy trigger description (single-line)
-- [ ] **PROD-03**: SKILL.md includes worked examples for all canonical use cases
-- [ ] **PROD-04**: Large reference sections are extracted to `references/` directory
-- [ ] **PROD-05**: Documenter agent (Sonnet) writes SETUP.md with prerequisites, API keys, quick start, and top 3 troubleshooting tips
+- [x] **PROD-01**: Mapper agent (Sonnet) translates KnowledgeModel into a draft SKILL.md under 500 lines
+- [x] **PROD-02**: SKILL.md includes YAML frontmatter with a specific, pushy trigger description (single-line)
+- [x] **PROD-03**: SKILL.md includes worked examples for all canonical use cases
+- [x] **PROD-04**: Large reference sections are extracted to `references/` directory
+- [x] **PROD-05**: Documenter agent (Sonnet) writes SETUP.md with prerequisites, API keys, quick start, and top 3 troubleshooting tips
 
 ### Validation
 
-- [ ] **VAL-01**: Compactness evaluator checks SKILL.md is under 500 lines
-- [ ] **VAL-02**: Syntax evaluator extracts code blocks and runs them through `ast.parse` to catch syntax errors
+- [x] **VAL-01**: Compactness evaluator checks SKILL.md is under 500 lines
+- [x] **VAL-02**: Syntax evaluator extracts code blocks and runs them through `ast.parse` to catch syntax errors
 - [ ] **VAL-03**: API Accuracy evaluator (Opus, LLM-as-judge) verifies every endpoint, class name, and CLI flag exists exactly in the organized research
 - [ ] **VAL-04**: Completeness evaluator (Opus, LLM-as-judge) verifies all canonical use cases have worked examples and all dependencies have installation commands
 - [ ] **VAL-05**: Trigger Quality evaluator (Opus, LLM-as-judge) verifies the trigger description is specific, pushy, and covers all reference trigger phrases
@@ -129,13 +129,13 @@
 | SYNTH-04 | Phase 2 | Complete |
 | SYNTH-05 | Phase 2 | Complete |
 | SYNTH-06 | Phase 2 | Complete |
-| PROD-01 | Phase 3 | Pending |
-| PROD-02 | Phase 3 | Pending |
-| PROD-03 | Phase 3 | Pending |
-| PROD-04 | Phase 3 | Pending |
-| PROD-05 | Phase 3 | Pending |
-| VAL-01 | Phase 3 | Pending |
-| VAL-02 | Phase 3 | Pending |
+| PROD-01 | Phase 3 | Complete |
+| PROD-02 | Phase 3 | Complete |
+| PROD-03 | Phase 3 | Complete |
+| PROD-04 | Phase 3 | Complete |
+| PROD-05 | Phase 3 | Complete |
+| VAL-01 | Phase 3 | Complete |
+| VAL-02 | Phase 3 | Complete |
 | VAL-03 | Phase 3 | Pending |
 | VAL-04 | Phase 3 | Pending |
 | VAL-05 | Phase 3 | Pending |

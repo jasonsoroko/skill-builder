@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 3 context gathered
-last_updated: "2026-03-05T18:33:00.962Z"
-last_activity: 2026-03-05 -- Plan 02-03 complete
+status: in-progress
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-05T20:15:35.420Z"
+last_activity: 2026-03-05 -- Plan 03-01 complete
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_plans: 9
+  completed_plans: 7
+  percent: 78
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-05)
 
 **Core value:** Produce skills accurate enough to install without manual editing -- no hallucinated APIs, no coverage gaps, no stale versions
-**Current focus:** Phase 2: Research Engine
+**Current focus:** Phase 3: Output Pipeline
 
 ## Current Position
 
-Phase: 2 of 3 (Research Engine)
-Plan: 3 of 3 in current phase
-Status: Phase 02 complete
-Last activity: 2026-03-05 -- Plan 02-03 complete
+Phase: 3 of 3 (Output Pipeline)
+Plan: 1 of 3 in current phase
+Status: Plan 03-01 complete
+Last activity: 2026-03-05 -- Plan 03-01 complete
 
-Progress: [██████████] 100%
+Progress: [████████░░] 78%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [██████████] 100%
 *Updated after each plan completion*
 | Phase 02 P02 | 8 | 2 tasks | 14 files |
 | Phase 02 P03 | 7 | 2 tasks | 10 files |
+| Phase 03 P01 | 3 | 1 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,9 @@ Recent decisions affecting current work:
 - [02-03]: Conductor tests explicitly pass stub_agents to avoid coupling to real agent API keys
 - [02-03]: CLI tests use autouse fixture to patch _default_agents globally for stub isolation
 - [02-03]: _build_kwargs(phase, state) centralizes focused kwargs dispatch in conductor
+- [Phase 03-01]: System prompts as module-level _SYSTEM_PROMPT constants (consistent with Phase 2 convention)
+- [Phase 03-01]: Heuristic evaluators are pure functions with no LLM dependencies, enabling fast fail-fast gating
+- [Phase 03-01]: SkillDraft.reference_files is optional (None default) for backward compatibility
 
 ### Pending Todos
 
@@ -99,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T18:33:00.954Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-output-pipeline/03-CONTEXT.md
+Last session: 2026-03-05T20:15:35.417Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None
