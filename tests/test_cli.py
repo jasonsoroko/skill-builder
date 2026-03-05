@@ -15,14 +15,49 @@ Covers:
 from __future__ import annotations
 
 import json
+from collections.abc import Generator
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
 
+from skill_builder.agents.stubs import (
+    StubDocumenterAgent,
+    StubGapAnalyzerAgent,
+    StubHarvestAgent,
+    StubIntakeAgent,
+    StubLearnerAgent,
+    StubMapperAgent,
+    StubOrganizerAgent,
+    StubPackagerAgent,
+    StubValidatorAgent,
+)
 from skill_builder.checkpoint import CheckpointStore
 from skill_builder.cli import build
 from skill_builder.models.state import PipelinePhase, PipelineState
+
+
+def _stub_agents() -> dict:
+    """Return a full set of stub agents for CLI testing."""
+    return {
+        "intake": StubIntakeAgent(),
+        "harvest": StubHarvestAgent(),
+        "organizer": StubOrganizerAgent(),
+        "gap_analyzer": StubGapAnalyzerAgent(),
+        "learner": StubLearnerAgent(),
+        "mapper": StubMapperAgent(),
+        "documenter": StubDocumenterAgent(),
+        "validator": StubValidatorAgent(),
+        "packager": StubPackagerAgent(),
+    }
+
+
+@pytest.fixture(autouse=True)
+def _use_stub_agents() -> Generator[None, None, None]:
+    """Patch _default_agents to return stubs so CLI tests don't need API keys."""
+    with patch("skill_builder.conductor._default_agents", _stub_agents):
+        yield
 
 
 @pytest.fixture

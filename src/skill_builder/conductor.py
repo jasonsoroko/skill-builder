@@ -14,14 +14,14 @@ import logging
 import time
 from typing import Any
 
+from skill_builder.agents.gap_analyzer import GapAnalyzerAgent
+from skill_builder.agents.harvest import HarvestAgent
+from skill_builder.agents.learner import LearnerAgent
+from skill_builder.agents.organizer import OrganizerAgent
 from skill_builder.agents.stubs import (
     StubDocumenterAgent,
-    StubGapAnalyzerAgent,
-    StubHarvestAgent,
     StubIntakeAgent,
-    StubLearnerAgent,
     StubMapperAgent,
-    StubOrganizerAgent,
     StubPackagerAgent,
     StubValidatorAgent,
 )
@@ -39,13 +39,17 @@ _CONDITIONAL = "conditional"
 
 
 def _default_agents() -> dict[str, Any]:
-    """Create the default set of stub agents for Phase 1."""
+    """Create the default agent set.
+
+    Phase 2 phases use real agent implementations.
+    Phase 3 phases (and intake) use stubs until implemented.
+    """
     return {
         "intake": StubIntakeAgent(),
-        "harvest": StubHarvestAgent(),
-        "organizer": StubOrganizerAgent(),
-        "gap_analyzer": StubGapAnalyzerAgent(),
-        "learner": StubLearnerAgent(),
+        "harvest": HarvestAgent(),
+        "organizer": OrganizerAgent(),
+        "gap_analyzer": GapAnalyzerAgent(),
+        "learner": LearnerAgent(),
         "mapper": StubMapperAgent(),
         "documenter": StubDocumenterAgent(),
         "validator": StubValidatorAgent(),
@@ -172,6 +176,9 @@ class Conductor:
     def _run_phase(self, phase: PipelinePhase, state: PipelineState) -> PipelineState:
         """Dispatch to the appropriate agent for the given phase.
 
+        Passes focused kwargs per phase so each agent receives only the
+        data it needs (Pattern 4 from RESEARCH.md).
+
         Args:
             phase: The current pipeline phase.
             state: The current pipeline state.
@@ -192,7 +199,8 @@ class Conductor:
         print(f"  [{phase_label}] Starting...")
         start = time.monotonic()
 
-        result = agent.run()
+        kwargs = self._build_kwargs(phase, state)
+        result = agent.run(**kwargs)
         elapsed = time.monotonic() - start
 
         # Store result in state based on phase
@@ -200,6 +208,78 @@ class Conductor:
 
         print(f"  [{phase_label}] Complete ({elapsed:.1f}s)")
         return state
+
+    def _build_kwargs(
+        self, phase: PipelinePhase, state: PipelineState
+    ) -> dict[str, Any]:
+        """Build focused kwargs for an agent based on the current phase.
+
+        Each agent receives only the data it needs. The conductor is the only
+        component that reads/writes PipelineState.
+        """
+        if phase == PipelinePhase.INTAKE:
+            return {"brief": self.brief}
+
+        if phase in (PipelinePhase.HARVESTING, PipelinePhase.RE_HARVESTING):
+            return {"brief": self.brief, "state": state}
+
+        if phase == PipelinePhase.ORGANIZING:
+            return {"raw_harvest": state.raw_harvest, "brief": self.brief}
+
+        if phase == PipelinePhase.GAP_ANALYZING:
+            kwargs: dict[str, Any] = {
+                "categorized_research": state.categorized_research,
+                "brief": self.brief,
+            }
+            # Pass harvest warnings if available in raw_harvest
+            if state.raw_harvest:
+                warnings = state.raw_harvest.get("warnings", [])
+                if warnings:
+                    kwargs["harvest_warnings"] = warnings
+            return kwargs
+
+        if phase == PipelinePhase.LEARNING:
+            return {
+                "categorized_research": state.categorized_research,
+                "gap_report": state.gap_report,
+                "brief": self.brief,
+            }
+
+        if phase == PipelinePhase.MAPPING:
+            return {
+                "knowledge_model": state.knowledge_model,
+                "brief": self.brief,
+            }
+
+        if phase == PipelinePhase.DOCUMENTING:
+            return {
+                "knowledge_model": state.knowledge_model,
+                "brief": self.brief,
+            }
+
+        if phase == PipelinePhase.VALIDATING:
+            return {
+                "skill_draft": state.skill_draft,
+                "setup_draft": state.setup_draft,
+                "knowledge_model": state.knowledge_model,
+                "brief": self.brief,
+            }
+
+        if phase == PipelinePhase.RE_PRODUCING:
+            return {
+                "knowledge_model": state.knowledge_model,
+                "brief": self.brief,
+            }
+
+        if phase == PipelinePhase.PACKAGING:
+            return {
+                "skill_draft": state.skill_draft,
+                "setup_draft": state.setup_draft,
+                "brief": self.brief,
+            }
+
+        # Fallback for unknown phases
+        return {}
 
     def _store_result(self, phase: PipelinePhase, state: PipelineState, result: Any) -> None:
         """Store agent output in the appropriate state field."""
