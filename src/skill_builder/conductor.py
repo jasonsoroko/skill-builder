@@ -32,6 +32,7 @@ from skill_builder.models.brief import SkillBrief
 from skill_builder.models.evaluation import EvaluationResult
 from skill_builder.models.state import PipelinePhase, PipelineState
 from skill_builder.models.synthesis import GapReport
+from skill_builder.tracing import traceable_agent
 
 logger = logging.getLogger(__name__)
 
@@ -212,7 +213,24 @@ class Conductor:
         start = time.monotonic()
 
         kwargs = self._build_kwargs(phase, state)
-        result = agent.run(**kwargs)
+
+        # Determine iteration for tracing metadata
+        if phase in (PipelinePhase.RE_HARVESTING, PipelinePhase.GAP_ANALYZING):
+            iteration = state.gap_loop_count
+        elif phase in (PipelinePhase.RE_PRODUCING, PipelinePhase.VALIDATING):
+            iteration = state.validation_loop_count
+        else:
+            iteration = 0
+
+        # Wrap agent.run with LangSmith tracing (no-op if unavailable)
+        traced_run = traceable_agent(
+            name=f"{agent_key}_run",
+            phase=phase_label,
+            agent_name=agent_key,
+            iteration=iteration,
+        )(agent.run)
+
+        result = traced_run(**kwargs)
         elapsed = time.monotonic() - start
 
         # Record token usage if agent provides metadata
