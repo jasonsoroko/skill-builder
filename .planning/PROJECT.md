@@ -2,76 +2,83 @@
 
 ## What This Is
 
-A Python CLI tool and multi-agent orchestration pipeline that takes seed URLs and a skill brief as input, conducts deep research, synthesizes knowledge through multiple AI agents, validates the output with LLM-as-judge evaluators, and produces a properly formatted `.skill` file ready for installation into Claude Code at repo or user scope. Built for local Mac use.
+A Python CLI tool and multi-agent orchestration pipeline that takes seed URLs and a skill brief as input, conducts deep research via Firecrawl/Exa/Tavily/GitHub, synthesizes knowledge through Sonnet and Opus agents with Pydantic-validated structured output, validates the output with heuristic and LLM-as-judge evaluators, and produces a properly formatted `.skill` file ready for installation into Claude Code. Built for local Mac use.
 
 ## Core Value
 
-Produce skills that are accurate enough to install without manual editing — no hallucinated APIs, no coverage gaps, no stale versions.
+Produce skills that are accurate enough to install without manual editing -- no hallucinated APIs, no coverage gaps, no stale versions.
 
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Accept structured skill brief (JSON) with seed URLs, tool category, scope, and required capabilities -- v1.0
+- ✓ Route URLs to correct extraction strategy (GitHub repos, docs sites/SPAs, API schemas, blogs) -- v1.0
+- ✓ Crawl dynamically rendered documentation using Firecrawl with JS rendering -- v1.0
+- ✓ Search for and extract OpenAPI/Swagger schemas as ground truth -- v1.0
+- ✓ Run supplemental semantic search via Exa and web search via Tavily -- v1.0
+- ✓ Deduplicate content by URL and content hash; detect version conflicts -- v1.0
+- ✓ Saturation check: LLM-driven assessment of whether critical info is missing -- v1.0
+- ✓ Organize raw research into structured categories (Organizer agent, Sonnet) -- v1.0
+- ✓ Cross-reference harvest against required_capabilities and flag gaps (Gap Analyzer, Opus) -- v1.0
+- ✓ Loop back to harvest when gaps are found, with targeted search queries -- v1.0
+- ✓ Extract structured KnowledgeModel from gap-free research (Learner agent, Sonnet) -- v1.0
+- ✓ Draft SKILL.md under 500 lines with worked examples and pushy trigger description -- v1.0
+- ✓ Generate SETUP.md with prerequisites, API keys, quick start, troubleshooting -- v1.0
+- ✓ Validate with heuristic evaluators: compactness (<500 lines), syntax (ast.parse code blocks) -- v1.0
+- ✓ Validate with LLM-as-judge evaluators: API accuracy, completeness, trigger quality (Opus) -- v1.0
+- ✓ Route back to production when any evaluator scores below 7, with specific feedback -- v1.0
+- ✓ Package output as .skill file for repo, user, or package deployment -- v1.0
+- ✓ Deterministic state machine conductor -- not an LLM call -- v1.0
+- ✓ Checkpoint persistence to JSON at every phase boundary -- v1.0
+- ✓ All agent calls traced via LangSmith @traceable; cost/token tracking offloaded to LangSmith -- v1.0
+- ✓ All agent outputs enforced via tool_use -> Pydantic models -- v1.0
+- ✓ Exponential backoff on all external API calls -- v1.0
+- ✓ Dry-run mode that prints fetch plan and exits -- v1.0
+- ✓ Fully autonomous operation -- no human gates required -- v1.0
 
 ### Active
 
-- [ ] Accept structured skill brief (JSON) with seed URLs, tool category, scope, and required capabilities
-- [ ] Route URLs to correct extraction strategy (GitHub repos, docs sites/SPAs, API schemas, blogs)
-- [ ] Crawl dynamically rendered documentation using Firecrawl with JS rendering
-- [ ] Search for and extract OpenAPI/Swagger schemas as ground truth
-- [ ] Run supplemental semantic search via Exa and web search via Tavily
-- [ ] Deduplicate content by URL and content hash; detect version conflicts
-- [ ] Saturation check: LLM-driven assessment of whether critical info is missing
-- [ ] Organize raw research into structured categories (Organizer agent, Sonnet)
-- [ ] Cross-reference harvest against required_capabilities and flag gaps (Gap Analyzer, Opus with adaptive thinking)
-- [ ] Loop back to harvest when gaps are found, with targeted search queries
-- [ ] Extract structured KnowledgeModel from gap-free research (Learner agent, Sonnet)
-- [ ] Draft SKILL.md under 500 lines with worked examples and pushy trigger description (Mapper agent)
-- [ ] Generate SETUP.md with prerequisites, API keys, quick start, troubleshooting (Documenter agent)
-- [ ] Validate with heuristic evaluators: compactness (<500 lines), syntax (ast.parse code blocks)
-- [ ] Validate with LLM-as-judge evaluators: API accuracy, completeness, trigger quality (Opus)
-- [ ] Route back to production when any evaluator scores below 7, with specific feedback
-- [ ] Package output as .skill file for repo, user, or package deployment
-- [ ] Deterministic state machine conductor — not an LLM call
-- [ ] Checkpoint persistence to JSON at every phase boundary
-- [ ] All agent calls traced via LangSmith @traceable; cost/token tracking offloaded to LangSmith
-- [ ] All agent outputs enforced via tool_use → Pydantic models
-- [ ] Exponential backoff on all external API calls
-- [ ] Dry-run mode that prints fetch plan and exits
-- [ ] Fully autonomous operation — no human gates required (run end-to-end)
+(None yet -- define with next milestone)
 
 ### Out of Scope
 
-- Web UI — CLI only
-- Automated testing against live Claude Code sessions — manual verification
-- CI/cloud deployment — local Mac only for now
-- Interactive human gates mid-pipeline — user wants fully autonomous runs
+- Web UI -- CLI only
+- Automated testing against live Claude Code sessions -- manual verification
+- CI/cloud deployment -- local Mac only for now
+- Interactive human gates mid-pipeline -- user wants fully autonomous runs
+- Near-duplicate detection via simhash/minhash -- standard dedup sufficient for v1
+- Cross-platform skill generation -- Claude Code only for now
 
 ## Context
 
-- The user is building Claude Code skills to shape Claude's behavior on specific tools and workflows. Skills are high-leverage: a gap or hallucination in a skill compounds every time Claude consults it.
-- The user is early in skill authoring (1-2 built manually) and has already hit all the common failure modes: missing capabilities, hallucinated APIs, stale API versions.
-- First target skill: a deep research crawling skill for Exa + Tavily + Firecrawl used together. This is meta — skill-builder depends on the same three tools.
-- The tool uses three research APIs (Exa, Tavily, Firecrawl), the Anthropic SDK for agents, and LangSmith for tracing and evaluation.
+Shipped v1.0 with 12,113 LOC Python across 122 files. 342 tests passing.
+Tech stack: Python 3.12, Click, Pydantic v2, Anthropic SDK (messages.parse), Firecrawl, Exa, Tavily, LangSmith, tenacity, Rich.
+Architecture: deterministic conductor state machine -> 9 agents (1 stub intake, 8 real) -> 5 evaluators.
+All 46 v1 requirements satisfied across 4 phases. Milestone audit passed with zero gaps.
 
 ## Constraints
 
-- **Model selection**: Sonnet 4.6 for generation/routing/mapping; Opus 4.6 exclusively for Gap Analyzer and Phase 4 LLM-as-judge evaluators. Adaptive thinking on both.
-- **Output format**: Must conform to Claude Code .skill format — SKILL.md with YAML frontmatter, <500 lines
+- **Model selection**: Sonnet 4.6 for generation/routing/mapping; Opus 4.6 exclusively for Gap Analyzer and LLM-as-judge evaluators. Adaptive thinking on both.
+- **Output format**: Must conform to Claude Code .skill format -- SKILL.md with YAML frontmatter, <500 lines
 - **Architecture**: Conductor must be a deterministic state machine, never an LLM call
-- **Concurrency**: Phase 1 (harvest) parallelized; Phase 2 (synthesis) sequential
+- **Concurrency**: Harvest parallelized via asyncio.gather; synthesis sequential
 - **Python packaging**: Proper pyproject.toml, Click CLI entry point
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Fully autonomous (no human gates) | User trusts the validation pipeline and wants speed | — Pending |
-| LangSmith for all cost/token tracking | Avoids duplicating observability locally; LangSmith already traces everything | — Pending |
-| Pydantic + tool_use for all agent outputs | Enforces structured output, prevents drift | — Pending |
-| Deterministic conductor (not LLM-routed) | Predictable, testable phase transitions; LLM routing adds latency and non-determinism | — Pending |
-| Local Mac only | Simplest deployment; CI can come later if needed | — Pending |
+| Fully autonomous (no human gates) | User trusts the validation pipeline and wants speed | ✓ Good -- pipeline runs end-to-end unattended |
+| LangSmith for all cost/token tracking | Avoids duplicating observability locally; LangSmith already traces everything | ✓ Good -- zero local tracking code needed |
+| Pydantic + tool_use for all agent outputs | Enforces structured output, prevents drift | ✓ Good -- caught schema violations during development |
+| Deterministic conductor (not LLM-routed) | Predictable, testable phase transitions; LLM routing adds latency and non-determinism | ✓ Good -- conductor is fully testable with stubs |
+| Local Mac only | Simplest deployment; CI can come later if needed | ✓ Good -- kept scope manageable |
+| Coarse 3-phase roadmap + 1 gap-closure phase | Following pipeline data flow (Foundation -> Research -> Output + Integration Wiring) | ✓ Good -- natural decomposition, clean dependencies |
+| Programmatic score >= 7 threshold override | Never trust LLM to judge its own pass/fail threshold | ✓ Good -- reliable validation gating |
+| Sync SDK clients wrapped in asyncio.to_thread() | Untested async variants for Exa/Tavily were unreliable | ✓ Good -- pragmatic approach that works |
+| Dynamic tracing at dispatch time (not static decorator) | Per-call metadata with iteration counts | ✓ Good -- correct phase/agent context in spans |
+| _usage_meta as dynamic attribute (not Pydantic field) | Avoids schema changes and serialization side effects | ✓ Good -- clean separation of concerns |
 
 ---
-*Last updated: 2026-03-05 after initialization*
+*Last updated: 2026-03-05 after v1.0 milestone*
