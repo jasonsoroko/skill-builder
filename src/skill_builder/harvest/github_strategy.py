@@ -12,10 +12,25 @@ import os
 import re
 
 import httpx
+from tenacity import AsyncRetrying, retry_if_exception, stop_after_attempt, wait_exponential_jitter
 
 from skill_builder.models.harvest import HarvestPage
+from skill_builder.resilience import _is_retryable_any, _make_retry_callback
 
 logger = logging.getLogger(__name__)
+
+
+async def _httpx_get_with_retry(client: httpx.AsyncClient, url: str, **kwargs) -> httpx.Response:
+    """Issue an httpx GET with exponential backoff retry on transient errors."""
+    async for attempt in AsyncRetrying(
+        wait=wait_exponential_jitter(initial=0.01, max=0.1, jitter=0.01),
+        stop=stop_after_attempt(5),
+        retry=retry_if_exception(_is_retryable_any),
+        reraise=True,
+        before_sleep=_make_retry_callback(),
+    ):
+        with attempt:
+            return await client.get(url, **kwargs)
 
 # Patterns for auto-discovering docs site URLs
 _DOCS_URL_PATTERNS = [
@@ -115,7 +130,7 @@ async def github_extract(
     ) as client:
         # 1. Fetch README
         readme_content = ""
-        resp = await client.get(
+        resp = await _httpx_get_with_retry(client,
             f"{_GITHUB_API}/repos/{owner}/{repo}/readme",
             headers={"Accept": "application/vnd.github.raw+json"},
         )
@@ -139,7 +154,9 @@ async def github_extract(
         for directory in ("docs", "examples"):
             if len(pages) >= max_pages:
                 break
-            resp = await client.get(f"{_GITHUB_API}/repos/{owner}/{repo}/contents/{directory}")
+            resp = await _httpx_get_with_retry(
+                client, f"{_GITHUB_API}/repos/{owner}/{repo}/contents/{directory}"
+            )
             if resp.status_code != 200:
                 continue
 
@@ -152,7 +169,7 @@ async def github_extract(
                 if not name.endswith(_EXTRACTABLE_EXTENSIONS):
                     continue
 
-                file_resp = await client.get(
+                file_resp = await _httpx_get_with_retry(client,
                     item["url"],
                     headers={"Accept": "application/vnd.github.raw+json"},
                 )
@@ -175,7 +192,7 @@ async def github_extract(
                     break
                 # Normalize path (remove leading ./)
                 clean_path = link_path.lstrip("./")
-                resp = await client.get(
+                resp = await _httpx_get_with_retry(client,
                     f"{_GITHUB_API}/repos/{owner}/{repo}/contents/{clean_path}",
                     headers={"Accept": "application/vnd.github.raw+json"},
                 )

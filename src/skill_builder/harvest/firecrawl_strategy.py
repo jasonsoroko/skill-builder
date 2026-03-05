@@ -10,17 +10,33 @@ import logging
 import os
 
 from firecrawl import AsyncFirecrawl
+from tenacity import AsyncRetrying, retry_if_exception, stop_after_attempt, wait_exponential_jitter
 
 from skill_builder.models.harvest import HarvestPage
+from skill_builder.resilience import _is_retryable_any, _make_retry_callback
 
 logger = logging.getLogger(__name__)
+
+
+async def _firecrawl_crawl_with_retry(fc, url: str, max_pages: int):
+    """Async Firecrawl crawl with exponential backoff retry."""
+    async for attempt in AsyncRetrying(
+        wait=wait_exponential_jitter(initial=0.01, max=0.1, jitter=0.01),
+        stop=stop_after_attempt(5),
+        retry=retry_if_exception(_is_retryable_any),
+        reraise=True,
+        before_sleep=_make_retry_callback(),
+    ):
+        with attempt:
+            return await fc.crawl(url, limit=max_pages, scrape_options={"formats": ["markdown"]})
 
 
 async def firecrawl_crawl(url: str, *, max_pages: int = 50) -> list[HarvestPage]:
     """Crawl a docs site via Firecrawl and return HarvestPages.
 
     Uses AsyncFirecrawl with JS rendering. Sets explicit limit matching
-    max_pages to avoid timeouts on large sites (Pitfall 2).
+    max_pages to avoid timeouts on large sites (Pitfall 2). Has exponential
+    backoff retry on transient errors via AsyncRetrying.
 
     Args:
         url: The documentation site URL to crawl.
@@ -32,11 +48,7 @@ async def firecrawl_crawl(url: str, *, max_pages: int = 50) -> list[HarvestPage]
     fc = AsyncFirecrawl(api_key=os.environ.get("FIRECRAWL_API_KEY", ""))
     logger.info("Starting Firecrawl crawl of %s (limit=%d)", url, max_pages)
 
-    result = await fc.crawl(
-        url,
-        limit=max_pages,
-        scrape_options={"formats": ["markdown"]},
-    )
+    result = await _firecrawl_crawl_with_retry(fc, url, max_pages)
 
     pages: list[HarvestPage] = []
     for doc in result.data:

@@ -14,15 +14,28 @@ import logging
 from tavily import TavilyClient
 
 from skill_builder.models.harvest import HarvestPage
+from skill_builder.resilience import api_retry_any
 
 logger = logging.getLogger(__name__)
+
+
+@api_retry_any()
+def _tavily_search_sync(tavily, query: str, max_results: int):
+    """Sync Tavily search call with retry wrapper."""
+    return tavily.search(
+        query,
+        search_depth="advanced",
+        max_results=max_results,
+        include_raw_content=True,
+    )
 
 
 async def tavily_search(query: str, *, max_results: int = 10) -> list[HarvestPage]:
     """Run a web search via Tavily and return HarvestPages.
 
     Uses sync TavilyClient wrapped in asyncio.to_thread() for async
-    compatibility. Reads TAVILY_API_KEY from environment.
+    compatibility. Reads TAVILY_API_KEY from environment. The inner sync
+    call has exponential backoff retry via api_retry_any.
 
     Args:
         query: Search query string.
@@ -35,14 +48,8 @@ async def tavily_search(query: str, *, max_results: int = 10) -> list[HarvestPag
 
     tavily = TavilyClient()  # Reads TAVILY_API_KEY from env
 
-    # Wrap sync call in asyncio.to_thread for async compatibility
-    response = await asyncio.to_thread(
-        tavily.search,
-        query,
-        search_depth="advanced",
-        max_results=max_results,
-        include_raw_content=True,
-    )
+    # Wrap sync call (with retry) in asyncio.to_thread for async compatibility
+    response = await asyncio.to_thread(_tavily_search_sync, tavily, query, max_results)
 
     pages: list[HarvestPage] = []
     for result in response.get("results", []):
