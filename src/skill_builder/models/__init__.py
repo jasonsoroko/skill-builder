@@ -11,22 +11,28 @@ from skill_builder.models.production import SetupDraft, SkillDraft
 from skill_builder.models.state import PipelinePhase, PipelineState
 from skill_builder.models.synthesis import (
     CategorizedResearch,
+    ContentItem,
     GapReport,
+    GeneratedQueries,
     KnowledgeModel,
     ResearchCategory,
+    SaturationResult,
 )
 
 __all__ = [
     "CategorizedResearch",
+    "ContentItem",
     "EvaluationDimension",
     "EvaluationResult",
     "GapReport",
+    "GeneratedQueries",
     "HarvestPage",
     "HarvestResult",
     "KnowledgeModel",
     "PipelinePhase",
     "PipelineState",
     "ResearchCategory",
+    "SaturationResult",
     "SeedUrl",
     "SetupDraft",
     "SkillBrief",

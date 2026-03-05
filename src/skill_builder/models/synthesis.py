@@ -9,11 +9,20 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
+class ContentItem(BaseModel):
+    """A content item with source attribution."""
+
+    text: str = Field(description="The content text")
+    source_url: str = Field(description="URL where this content originated")
+
+
 class ResearchCategory(BaseModel):
     """A single category of organized research."""
 
     name: str = Field(description="Category name (e.g., installation, core concepts)")
-    content: list[str] = Field(default_factory=list, description="Content items in this category")
+    content: list[ContentItem] = Field(
+        default_factory=list, description="Content items with source attribution"
+    )
 
 
 class CategorizedResearch(BaseModel):
@@ -23,6 +32,9 @@ class CategorizedResearch(BaseModel):
         default_factory=list, description="Research organized by category"
     )
     source_count: int = Field(default=0, description="Number of sources processed")
+    tools_covered: list[str] = Field(
+        default_factory=list, description="Which tools had content"
+    )
 
 
 class GapReport(BaseModel):
@@ -66,4 +78,20 @@ class KnowledgeModel(BaseModel):
     )
     trigger_phrases: list[str] = Field(
         default_factory=list, description="Phrases that should activate this skill"
+    )
+
+
+class GeneratedQueries(BaseModel):
+    """LLM-generated search queries for Exa and Tavily."""
+
+    exa_queries: list[str] = Field(description="Semantic search queries for Exa")
+    tavily_queries: list[str] = Field(description="Factual search queries for Tavily")
+
+
+class SaturationResult(BaseModel):
+    """Result of the lightweight saturation pre-filter check."""
+
+    is_saturated: bool = Field(description="Whether harvested content covers required capabilities")
+    missing_capabilities: list[str] = Field(
+        default_factory=list, description="Required capabilities with no content"
     )

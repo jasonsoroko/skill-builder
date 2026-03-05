@@ -20,6 +20,7 @@ from skill_builder.models.harvest import HarvestPage, HarvestResult
 from skill_builder.models.production import SetupDraft, SkillDraft
 from skill_builder.models.synthesis import (
     CategorizedResearch,
+    ContentItem,
     GapReport,
     KnowledgeModel,
     ResearchCategory,
@@ -83,25 +84,46 @@ class StubOrganizerAgent:
             ResearchCategory(
                 name="installation",
                 content=[
-                    "pip install exa-py",
-                    "pip install tavily-python",
-                    "pip install firecrawl-py",
+                    ContentItem(text="pip install exa-py", source_url="https://docs.exa.ai/"),
+                    ContentItem(
+                        text="pip install tavily-python", source_url="https://docs.tavily.com/"
+                    ),
+                    ContentItem(
+                        text="pip install firecrawl-py", source_url="https://docs.firecrawl.dev/"
+                    ),
                 ],
             ),
             ResearchCategory(
                 name="core-concepts",
                 content=[
-                    "Exa uses neural search for semantic retrieval",
-                    "Tavily optimizes web search for AI applications",
-                    "Firecrawl converts websites to structured data",
+                    ContentItem(
+                        text="Exa uses neural search for semantic retrieval",
+                        source_url="https://docs.exa.ai/",
+                    ),
+                    ContentItem(
+                        text="Tavily optimizes web search for AI applications",
+                        source_url="https://docs.tavily.com/",
+                    ),
+                    ContentItem(
+                        text="Firecrawl converts websites to structured data",
+                        source_url="https://docs.firecrawl.dev/",
+                    ),
                 ],
             ),
             ResearchCategory(
                 name="authentication",
                 content=[
-                    "Exa requires EXA_API_KEY",
-                    "Tavily requires TAVILY_API_KEY",
-                    "Firecrawl requires FIRECRAWL_API_KEY",
+                    ContentItem(
+                        text="Exa requires EXA_API_KEY", source_url="https://docs.exa.ai/"
+                    ),
+                    ContentItem(
+                        text="Tavily requires TAVILY_API_KEY",
+                        source_url="https://docs.tavily.com/",
+                    ),
+                    ContentItem(
+                        text="Firecrawl requires FIRECRAWL_API_KEY",
+                        source_url="https://docs.firecrawl.dev/",
+                    ),
                 ],
             ),
         ]

@@ -5,6 +5,9 @@ Covers:
 - PipelineState JSON round-trip with datetime and enum
 - PipelinePhase enum string serialization
 - Model module exports
+- HarvestPage/HarvestResult source attribution and version tracking fields
+- ContentItem, GeneratedQueries, SaturationResult new models
+- ResearchCategory uses ContentItem
 """
 
 from __future__ import annotations
@@ -16,7 +19,15 @@ import pytest
 from pydantic import ValidationError
 
 from skill_builder.models.brief import SkillBrief
+from skill_builder.models.harvest import HarvestPage, HarvestResult
 from skill_builder.models.state import PipelinePhase, PipelineState
+from skill_builder.models.synthesis import (
+    CategorizedResearch,
+    ContentItem,
+    GeneratedQueries,
+    ResearchCategory,
+    SaturationResult,
+)
 
 
 class TestSkillBrief:
@@ -196,15 +207,18 @@ class TestModelExports:
 
         expected_exports = [
             "CategorizedResearch",
+            "ContentItem",
             "EvaluationDimension",
             "EvaluationResult",
             "GapReport",
+            "GeneratedQueries",
             "HarvestPage",
             "HarvestResult",
             "KnowledgeModel",
             "PipelinePhase",
             "PipelineState",
             "ResearchCategory",
+            "SaturationResult",
             "SeedUrl",
             "SetupDraft",
             "SkillBrief",
@@ -212,3 +226,175 @@ class TestModelExports:
         ]
         for name in expected_exports:
             assert hasattr(models, name), f"models.__init__ missing export: {name}"
+
+
+class TestHarvestPageExtensions:
+    """Test HarvestPage source attribution and version tracking fields."""
+
+    def test_harvest_page_new_optional_fields_default_none(self) -> None:
+        """HarvestPage new optional fields default to None."""
+        page = HarvestPage(
+            url="https://example.com",
+            title="Test",
+            content="Hello",
+            source_type="crawl",
+        )
+        assert page.source_url is None
+        assert page.detected_version is None
+
+    def test_harvest_page_with_new_fields_roundtrips_json(self) -> None:
+        """HarvestPage with source_url and detected_version round-trips through JSON."""
+        page = HarvestPage(
+            url="https://example.com/docs",
+            title="API Docs",
+            content="Version 4.18 reference",
+            source_type="crawl",
+            source_url="https://example.com",
+            detected_version="4.18.0",
+        )
+        json_str = page.model_dump_json()
+        restored = HarvestPage.model_validate_json(json_str)
+        assert restored.source_url == "https://example.com"
+        assert restored.detected_version == "4.18.0"
+        assert restored.url == "https://example.com/docs"
+
+
+class TestHarvestResultExtensions:
+    """Test HarvestResult warnings, version_conflicts, queries_used fields."""
+
+    def test_harvest_result_new_fields_default_empty(self) -> None:
+        """HarvestResult new fields default to empty lists."""
+        result = HarvestResult()
+        assert result.warnings == []
+        assert result.version_conflicts == []
+        assert result.queries_used == []
+
+    def test_harvest_result_with_warnings_roundtrips_json(self) -> None:
+        """HarvestResult with warnings and version_conflicts serializes/deserializes."""
+        result = HarvestResult(
+            pages=[],
+            total_pages=0,
+            warnings=["Version conflict: source A reports v1.2, source B reports v1.3"],
+            version_conflicts=[
+                {"source_url": "https://a.com", "version": "1.2", "url": "https://a.com/docs"},
+                {"source_url": "https://b.com", "version": "1.3", "url": "https://b.com/docs"},
+            ],
+            queries_used=["exa best practices", "tavily error messages"],
+        )
+        json_str = result.model_dump_json()
+        restored = HarvestResult.model_validate_json(json_str)
+        assert len(restored.warnings) == 1
+        assert len(restored.version_conflicts) == 2
+        assert len(restored.queries_used) == 2
+        assert restored.version_conflicts[0]["version"] == "1.2"
+
+
+class TestContentItem:
+    """Test the new ContentItem model."""
+
+    def test_content_item_validates_text_and_source_url(self) -> None:
+        """ContentItem requires text and source_url."""
+        item = ContentItem(text="Some research content", source_url="https://example.com")
+        assert item.text == "Some research content"
+        assert item.source_url == "https://example.com"
+
+    def test_content_item_missing_field_raises_error(self) -> None:
+        """ContentItem missing required field raises ValidationError."""
+        with pytest.raises(ValidationError):
+            ContentItem(text="Some content")  # type: ignore[call-arg]
+
+    def test_content_item_roundtrips_json(self) -> None:
+        """ContentItem round-trips through JSON serialization."""
+        item = ContentItem(text="Test content", source_url="https://example.com/page")
+        json_str = item.model_dump_json()
+        restored = ContentItem.model_validate_json(json_str)
+        assert restored.text == item.text
+        assert restored.source_url == item.source_url
+
+
+class TestResearchCategoryWithContentItem:
+    """Test ResearchCategory now holds ContentItem list."""
+
+    def test_research_category_holds_content_items(self) -> None:
+        """ResearchCategory.content is a list of ContentItem objects."""
+        cat = ResearchCategory(
+            name="installation",
+            content=[
+                ContentItem(text="pip install exa-py", source_url="https://docs.exa.ai/"),
+                ContentItem(text="pip install tavily-python", source_url="https://docs.tavily.com/"),
+            ],
+        )
+        assert len(cat.content) == 2
+        assert isinstance(cat.content[0], ContentItem)
+        assert cat.content[0].source_url == "https://docs.exa.ai/"
+
+
+class TestCategorizedResearchExtensions:
+    """Test CategorizedResearch tools_covered field."""
+
+    def test_categorized_research_has_tools_covered(self) -> None:
+        """CategorizedResearch has tools_covered list field."""
+        cr = CategorizedResearch(
+            categories=[],
+            source_count=5,
+            tools_covered=["exa", "tavily", "firecrawl"],
+        )
+        assert cr.tools_covered == ["exa", "tavily", "firecrawl"]
+
+    def test_categorized_research_tools_covered_defaults_empty(self) -> None:
+        """CategorizedResearch.tools_covered defaults to empty list."""
+        cr = CategorizedResearch()
+        assert cr.tools_covered == []
+
+
+class TestGeneratedQueries:
+    """Test the new GeneratedQueries model."""
+
+    def test_generated_queries_validates_both_lists(self) -> None:
+        """GeneratedQueries requires exa_queries and tavily_queries."""
+        gq = GeneratedQueries(
+            exa_queries=["exa semantic search best practices"],
+            tavily_queries=["tavily error messages gotchas"],
+        )
+        assert len(gq.exa_queries) == 1
+        assert len(gq.tavily_queries) == 1
+
+    def test_generated_queries_roundtrips_json(self) -> None:
+        """GeneratedQueries round-trips through JSON serialization."""
+        gq = GeneratedQueries(
+            exa_queries=["query1", "query2"],
+            tavily_queries=["query3", "query4"],
+        )
+        json_str = gq.model_dump_json()
+        restored = GeneratedQueries.model_validate_json(json_str)
+        assert restored.exa_queries == gq.exa_queries
+        assert restored.tavily_queries == gq.tavily_queries
+
+
+class TestSaturationResult:
+    """Test the new SaturationResult model."""
+
+    def test_saturation_result_validates_fields(self) -> None:
+        """SaturationResult validates is_saturated and missing_capabilities."""
+        sr = SaturationResult(
+            is_saturated=False,
+            missing_capabilities=["semantic search", "error handling"],
+        )
+        assert sr.is_saturated is False
+        assert len(sr.missing_capabilities) == 2
+
+    def test_saturation_result_missing_capabilities_defaults_empty(self) -> None:
+        """SaturationResult.missing_capabilities defaults to empty list."""
+        sr = SaturationResult(is_saturated=True)
+        assert sr.missing_capabilities == []
+
+    def test_saturation_result_roundtrips_json(self) -> None:
+        """SaturationResult round-trips through JSON serialization."""
+        sr = SaturationResult(
+            is_saturated=False,
+            missing_capabilities=["web crawling"],
+        )
+        json_str = sr.model_dump_json()
+        restored = SaturationResult.model_validate_json(json_str)
+        assert restored.is_saturated is False
+        assert restored.missing_capabilities == ["web crawling"]
