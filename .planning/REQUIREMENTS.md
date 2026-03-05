@@ -20,14 +20,14 @@
 
 ### Content Harvest
 
-- [ ] **HARV-01**: Content router classifies URLs by type (GitHub repo, docs site/SPA, API schema, blog/tutorial) and selects extraction strategy
+- [x] **HARV-01**: Content router classifies URLs by type (GitHub repo, docs site/SPA, API schema, blog/tutorial) and selects extraction strategy
 - [ ] **HARV-02**: Firecrawl crawls docs sites with JS rendering enabled to capture dynamically generated pages
 - [ ] **HARV-03**: Pipeline actively searches for and extracts OpenAPI/Swagger JSON schemas as ground truth
-- [ ] **HARV-04**: Pipeline validates extracted API data against `target_api_version` from the brief and discards deprecated endpoints
+- [x] **HARV-04**: Pipeline validates extracted API data against `target_api_version` from the brief and discards deprecated endpoints
 - [ ] **HARV-05**: Exa semantic search finds examples and best practices for the target tool
 - [ ] **HARV-06**: Tavily web search finds common errors and Claude Code integration patterns
-- [ ] **HARV-07**: Content is deduplicated by URL and content hash before synthesis
-- [ ] **HARV-08**: Version numbers are detected across sources and conflicts are flagged
+- [x] **HARV-07**: Content is deduplicated by URL and content hash before synthesis
+- [x] **HARV-08**: Version numbers are detected across sources and conflicts are flagged
 - [ ] **HARV-09**: Saturation check: LLM assesses whether critical information is still missing after each harvest round
 - [ ] **HARV-10**: Harvest phase runs URL extraction and supplemental searches in parallel
 
@@ -113,14 +113,14 @@
 | CORE-08 | Phase 1 | Complete |
 | CORE-09 | Phase 1 | Complete |
 | CORE-10 | Phase 3 | Pending |
-| HARV-01 | Phase 2 | Pending |
+| HARV-01 | Phase 2 | Complete |
 | HARV-02 | Phase 2 | Pending |
 | HARV-03 | Phase 2 | Pending |
-| HARV-04 | Phase 2 | Pending |
+| HARV-04 | Phase 2 | Complete |
 | HARV-05 | Phase 2 | Pending |
 | HARV-06 | Phase 2 | Pending |
-| HARV-07 | Phase 2 | Pending |
-| HARV-08 | Phase 2 | Pending |
+| HARV-07 | Phase 2 | Complete |
+| HARV-08 | Phase 2 | Complete |
 | HARV-09 | Phase 2 | Pending |
 | HARV-10 | Phase 2 | Pending |
 | SYNTH-01 | Phase 2 | Pending |
