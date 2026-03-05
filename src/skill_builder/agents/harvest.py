@@ -86,8 +86,15 @@ class HarvestAgent:
         """Async harvest orchestration."""
         logger.info("HarvestAgent starting for %s", brief.name)
 
-        # Step 1: Generate search queries
+        # Step 1: Generate search queries and start usage accumulation
         queries = self._generate_queries(brief, state)
+        _accumulated_usage = {"model": "claude-sonnet-4-6", "input_tokens": 0, "output_tokens": 0}
+        queries_meta = getattr(queries, "_usage_meta", None)
+        if queries_meta:
+            _accumulated_usage["input_tokens"] += queries_meta["input_tokens"]
+            _accumulated_usage["output_tokens"] += queries_meta["output_tokens"]
+            _accumulated_usage["model"] = queries_meta["model"]
+
         logger.info(
             "Generated %d exa + %d tavily queries",
             len(queries.exa_queries),
@@ -163,21 +170,28 @@ class HarvestAgent:
         logger.info("After dedup: %d pages (from %d raw)", len(pages), len(all_pages))
 
         # Step 6: Version detection and conflict checking
-        for page in pages:
+        # FIX: Use enumerate to update the list in-place (model_copy returns
+        # a new object; reassigning loop variable does NOT mutate the list)
+        for i, page in enumerate(pages):
             versions = detect_version(page.content)
             if versions:
-                page = page.model_copy(update={"detected_version": versions[0]})
+                pages[i] = page.model_copy(update={"detected_version": versions[0]})
 
         conflicts, version_warnings = check_version_conflicts(pages, brief.target_api_version)
 
         # Step 7: Saturation pre-filter
         saturation = await check_saturation(self.client, pages, brief.required_capabilities)
+        sat_meta = getattr(saturation, "_usage_meta", None)
+        if sat_meta:
+            _accumulated_usage["input_tokens"] += sat_meta["input_tokens"]
+            _accumulated_usage["output_tokens"] += sat_meta["output_tokens"]
+
         warnings = list(version_warnings)
         if not saturation.is_saturated:
             missing = ", ".join(saturation.missing_capabilities)
             warnings.append(f"Saturation: missing content for {missing}")
 
-        # Step 8: Build and return HarvestResult
+        # Step 8: Build and return HarvestResult with accumulated usage
         result = HarvestResult(
             pages=pages,
             total_pages=len(pages),
@@ -185,6 +199,10 @@ class HarvestAgent:
             version_conflicts=conflicts,
             queries_used=queries.exa_queries + queries.tavily_queries,
         )
+
+        # Attach accumulated usage metadata if any sub-call provided it
+        if _accumulated_usage["input_tokens"] > 0 or _accumulated_usage["output_tokens"] > 0:
+            result._usage_meta = _accumulated_usage  # type: ignore[attr-defined]
 
         logger.info(
             "HarvestAgent complete: %d pages, %d warnings, %d conflicts",
