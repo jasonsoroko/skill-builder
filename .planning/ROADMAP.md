@@ -28,12 +28,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can run `skill-builder build brief.json --dry-run` and see a fetch plan with estimated API costs without any external calls being made
   4. All Anthropic API calls during a run appear as traced spans in LangSmith with phase/agent/iteration metadata, and a LangSmith tracing failure does not crash the pipeline
   5. Any simulated external API failure triggers exponential backoff retries (visible in logs), and the global token budget cap halts execution when exceeded
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md -- Project scaffold, Pydantic data models, example brief, test infrastructure
+- [ ] 01-02-PLAN.md -- Checkpoint store, token budget, LangSmith tracing, resilience, stub agents
+- [ ] 01-03-PLAN.md -- Conductor state machine and Click CLI entry point
 
 ### Phase 2: Research Engine
 **Goal**: Given a skill brief with seed URLs, the pipeline harvests content from all source types in parallel, deduplicates and version-checks it, organizes it into structured categories, identifies gaps against required capabilities, loops back to harvest when gaps are found, and produces a validated KnowledgeModel
@@ -76,6 +76,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 0/3 | Planning complete | - |
 | 2. Research Engine | 0/3 | Not started | - |
 | 3. Output Pipeline | 0/3 | Not started | - |
