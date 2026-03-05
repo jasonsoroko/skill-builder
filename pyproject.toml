@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "skill-builder"
+version = "0.1.0"
+description = "Autonomous CLI pipeline that transforms seed URLs and a skill brief into a validated .skill file"
+requires-python = ">=3.12,<3.15"
+license = "MIT"
+dependencies = [
+    "click>=8.3,<9",
+    "pydantic>=2.12,<3",
+    "anthropic>=0.84,<1",
+    "langsmith>=0.7,<1",
+    "tenacity>=9.1,<10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-timeout",
+    "ruff>=0.15",
+    "mypy>=1.13",
+]
+
+[project.scripts]
+skill-builder = "skill_builder.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 10
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
