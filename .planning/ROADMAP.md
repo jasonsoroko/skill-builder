@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Project scaffold, Pydantic data models, example brief, test infrastructure
+- [x] 01-01-PLAN.md -- Project scaffold, Pydantic data models, example brief, test infrastructure
 - [ ] 01-02-PLAN.md -- Checkpoint store, token budget, LangSmith tracing, resilience, stub agents
 - [ ] 01-03-PLAN.md -- Conductor state machine and Click CLI entry point
 
@@ -76,6 +76,6 @@ Phases execute in numeric order: 1 -> 2 -> 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Planning complete | - |
+| 1. Foundation | 1/3 | In Progress | - |
 | 2. Research Engine | 0/3 | Not started | - |
 | 3. Output Pipeline | 0/3 | Not started | - |

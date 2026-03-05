@@ -7,7 +7,7 @@
 
 ### Pipeline Core
 
-- [ ] **CORE-01**: User can provide a structured skill brief (JSON) with seed URLs, tool category, scope, required capabilities, and deploy target
+- [x] **CORE-01**: User can provide a structured skill brief (JSON) with seed URLs, tool category, scope, required capabilities, and deploy target
 - [ ] **CORE-02**: Conductor implements a deterministic state machine with explicit phase transitions (intake → harvest → synthesis → production → validation → packaging)
 - [ ] **CORE-03**: Conductor routes Gap Analyzer failures back to harvest with recommended search queries (max 2 iterations)
 - [ ] **CORE-04**: Conductor routes validation failures back to production with evaluator feedback (max 2 iterations)
@@ -103,7 +103,7 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CORE-01 | Phase 1 | Pending |
+| CORE-01 | Phase 1 | Complete |
 | CORE-02 | Phase 1 | Pending |
 | CORE-03 | Phase 1 | Pending |
 | CORE-04 | Phase 1 | Pending |
