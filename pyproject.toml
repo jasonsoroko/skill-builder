@@ -44,3 +44,8 @@ select = ["E", "F", "I", "UP"]
 [tool.mypy]
 python_version = "3.12"
 strict = true
+
+[dependency-groups]
+dev = [
+    "pytest-asyncio>=0.25",
+]
