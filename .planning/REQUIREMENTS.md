@@ -112,7 +112,7 @@
 | CORE-07 | Phase 1 | Pending |
 | CORE-08 | Phase 1 | Pending |
 | CORE-09 | Phase 1 | Pending |
-| CORE-10 | Phase 1 | Pending |
+| CORE-10 | Phase 3 | Pending |
 | HARV-01 | Phase 2 | Pending |
 | HARV-02 | Phase 2 | Pending |
 | HARV-03 | Phase 2 | Pending |
@@ -123,38 +123,38 @@
 | HARV-08 | Phase 2 | Pending |
 | HARV-09 | Phase 2 | Pending |
 | HARV-10 | Phase 2 | Pending |
-| SYNTH-01 | Phase 3 | Pending |
-| SYNTH-02 | Phase 3 | Pending |
-| SYNTH-03 | Phase 3 | Pending |
-| SYNTH-04 | Phase 3 | Pending |
-| SYNTH-05 | Phase 3 | Pending |
-| SYNTH-06 | Phase 3 | Pending |
-| PROD-01 | Phase 4 | Pending |
-| PROD-02 | Phase 4 | Pending |
-| PROD-03 | Phase 4 | Pending |
-| PROD-04 | Phase 4 | Pending |
-| PROD-05 | Phase 4 | Pending |
-| VAL-01 | Phase 5 | Pending |
-| VAL-02 | Phase 5 | Pending |
-| VAL-03 | Phase 5 | Pending |
-| VAL-04 | Phase 5 | Pending |
-| VAL-05 | Phase 5 | Pending |
-| VAL-06 | Phase 5 | Pending |
+| SYNTH-01 | Phase 2 | Pending |
+| SYNTH-02 | Phase 2 | Pending |
+| SYNTH-03 | Phase 2 | Pending |
+| SYNTH-04 | Phase 2 | Pending |
+| SYNTH-05 | Phase 2 | Pending |
+| SYNTH-06 | Phase 2 | Pending |
+| PROD-01 | Phase 3 | Pending |
+| PROD-02 | Phase 3 | Pending |
+| PROD-03 | Phase 3 | Pending |
+| PROD-04 | Phase 3 | Pending |
+| PROD-05 | Phase 3 | Pending |
+| VAL-01 | Phase 3 | Pending |
+| VAL-02 | Phase 3 | Pending |
+| VAL-03 | Phase 3 | Pending |
+| VAL-04 | Phase 3 | Pending |
+| VAL-05 | Phase 3 | Pending |
+| VAL-06 | Phase 3 | Pending |
 | OBS-01 | Phase 1 | Pending |
 | OBS-02 | Phase 1 | Pending |
 | OBS-03 | Phase 1 | Pending |
-| PKG-01 | Phase 5 | Pending |
-| PKG-02 | Phase 5 | Pending |
-| PKG-03 | Phase 5 | Pending |
+| PKG-01 | Phase 3 | Pending |
+| PKG-02 | Phase 3 | Pending |
+| PKG-03 | Phase 3 | Pending |
 | RES-01 | Phase 1 | Pending |
 | RES-02 | Phase 1 | Pending |
 | RES-03 | Phase 1 | Pending |
 
 **Coverage:**
-- v1 requirements: 40 total
-- Mapped to phases: 40
+- v1 requirements: 46 total
+- Mapped to phases: 46
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-05*
-*Last updated: 2026-03-05 after initial definition*
+*Last updated: 2026-03-05 after roadmap creation (phase assignments updated, requirement count corrected from 40 to 46)*
