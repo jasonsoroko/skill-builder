@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 4 context gathered
-last_updated: "2026-03-05T21:43:47.861Z"
-last_activity: 2026-03-05 -- Plan 03-03 complete (all phases complete)
+stopped_at: All plans complete
+last_updated: "2026-03-05T22:31:00Z"
+last_activity: 2026-03-05 -- Plan 04-02 complete (budget recording + tracing wiring)
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  completed_phases: 4
+  total_plans: 11
+  completed_plans: 11
   percent: 100
 ---
 
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-05)
 
 **Core value:** Produce skills accurate enough to install without manual editing -- no hallucinated APIs, no coverage gaps, no stale versions
-**Current focus:** Phase 3: Output Pipeline
+**Current focus:** All phases complete
 
 ## Current Position
 
-Phase: 3 of 3 (Output Pipeline)
-Plan: 3 of 3 in current phase
+Phase: 4 of 4 (Integration Wiring)
+Plan: 2 of 2 in current phase
 Status: All plans complete
-Last activity: 2026-03-05 -- Plan 03-03 complete (all phases complete)
+Last activity: 2026-03-05 -- Plan 04-02 complete (budget recording + tracing wiring)
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 5.3 min
-- Total execution time: 0.80 hours
+- Total plans completed: 11
+- Average duration: 5.5 min
+- Total execution time: 1.00 hours
 
 **By Phase:**
 
@@ -47,9 +47,10 @@ Progress: [██████████] 100%
 | 02-research-engine | 3 | 20 min | 6.7 min |
 
 | 03-output-pipeline | 3 | 14 min | 4.7 min |
+| 04-integration-wiring | 2 | 12 min | 6.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (6 min), 02-03 (7 min), 03-01 (3 min), 03-02 (5 min), 03-03 (6 min)
+- Last 5 plans: 03-01 (3 min), 03-02 (5 min), 03-03 (6 min), 04-01 (6 min), 04-02 (6 min)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -58,6 +59,8 @@ Progress: [██████████] 100%
 | Phase 03 P01 | 3 | 1 tasks | 9 files |
 | Phase 03 P02 | 5 | 2 tasks | 10 files |
 | Phase 03 P03 | 6 | 2 tasks | 11 files |
+| Phase 04 P01 | 6 | 2 tasks | 8 files |
+| Phase 04 P02 | 6 | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -101,6 +104,10 @@ Recent decisions affecting current work:
 - [Phase 03-03]: PackagerAgent is pure Python file operations with no LLM calls -- the only non-LLM production agent
 - [Phase 03-03]: Rich added as required dependency (not optional) since CLI is the primary interface
 - [Phase 03-03]: PipelineState extended with package_path and verification_instructions for end-to-end result propagation
+- [04-01]: Unified _is_retryable_any covers all SDKs in one classifier rather than per-SDK wrappers
+- [04-01]: Exa retry on requests.ConnectionError/Timeout only -- not generic ValueError (avoids retrying auth errors)
+- [04-01]: Retry callback uses print() for CLI visibility per locked decision
+- [04-01]: Usage accumulation as getattr pattern -- no structural changes to result models
 
 ### Pending Todos
 
@@ -114,6 +121,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T21:43:47.845Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-integration-wiring/04-CONTEXT.md
+Last session: 2026-03-05T22:30:40Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: .planning/phases/04-integration-wiring/04-02-PLAN.md

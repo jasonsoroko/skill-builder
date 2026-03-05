@@ -27,7 +27,7 @@
 - [x] **HARV-05**: Exa semantic search finds examples and best practices for the target tool
 - [x] **HARV-06**: Tavily web search finds common errors and Claude Code integration patterns
 - [x] **HARV-07**: Content is deduplicated by URL and content hash before synthesis
-- [ ] **HARV-08**: Version numbers are detected across sources and conflicts are flagged
+- [x] **HARV-08**: Version numbers are detected across sources and conflicts are flagged
 - [x] **HARV-09**: Saturation check: LLM assesses whether critical information is still missing after each harvest round
 - [x] **HARV-10**: Harvest phase runs URL extraction and supplemental searches in parallel
 
@@ -71,7 +71,7 @@
 
 ### Resilience
 
-- [ ] **RES-01**: Exponential backoff on all external API calls (Anthropic, Exa, Tavily, Firecrawl)
+- [x] **RES-01**: Exponential backoff on all external API calls (Anthropic, Exa, Tavily, Firecrawl)
 - [x] **RES-02**: LangSmith tracing errors never block the pipeline (wrapped at integration boundary)
 - [x] **RES-03**: Feedback loops have hard iteration caps (max 2 for gap analysis, max 2 for validation)
 
@@ -120,7 +120,7 @@
 | HARV-05 | Phase 2 | Complete |
 | HARV-06 | Phase 2 | Complete |
 | HARV-07 | Phase 2 | Complete |
-| HARV-08 | Phase 4 | Pending |
+| HARV-08 | Phase 4 | Complete |
 | HARV-09 | Phase 2 | Complete |
 | HARV-10 | Phase 2 | Complete |
 | SYNTH-01 | Phase 2 | Complete |
@@ -146,7 +146,7 @@
 | PKG-01 | Phase 3 | Complete |
 | PKG-02 | Phase 3 | Complete |
 | PKG-03 | Phase 3 | Complete |
-| RES-01 | Phase 4 | Pending |
+| RES-01 | Phase 4 | Complete |
 | RES-02 | Phase 1 | Complete |
 | RES-03 | Phase 1 | Complete |
 

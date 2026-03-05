@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Foundation** - Conductor state machine, Pydantic models, checkpoint persistence, CLI scaffold, tracing, and resilience patterns
 - [ ] **Phase 2: Research Engine** - URL classification, multi-source content extraction, parallel harvest, agent synthesis with gap analysis loopback
 - [ ] **Phase 3: Output Pipeline** - Production agents, heuristic and LLM-as-judge validation, feedback routing, packaging, and Rich CLI polish
-- [ ] **Phase 4: Integration Wiring** - Wire budget recording, retry decorators, tracing decorators, and fix version detection persistence (gap closure from audit)
+- [x] **Phase 4: Integration Wiring** - Wire budget recording, retry decorators, tracing decorators, and fix version detection persistence (gap closure from audit) (completed 2026-03-05)
 
 ## Phase Details
 
@@ -80,7 +80,7 @@ Plans:
   2. Killing a Firecrawl/Exa/Tavily API endpoint (simulated via mock raising transient error) triggers exponential backoff retries visible in logs before the call succeeds or exhausts retries
   3. Every agent.run() call creates a LangSmith span with phase, agent_name, and iteration metadata tags (visible when LangSmith is configured; no-op when not)
   4. After harvest, every HarvestPage in HarvestResult.pages has detected_version populated when the content contains a semver string
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 04-01-PLAN.md -- Extend unified retry to all SDKs, apply to strategy functions, fix version detection persistence
@@ -96,4 +96,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Foundation | 3/3 | Complete | 2026-03-05 |
 | 2. Research Engine | 3/3 | Complete | 2026-03-05 |
 | 3. Output Pipeline | 3/3 | Complete | 2026-03-05 |
-| 4. Integration Wiring | 0/2 | Not started | - |
+| 4. Integration Wiring | 2/2 | Complete   | 2026-03-05 |
