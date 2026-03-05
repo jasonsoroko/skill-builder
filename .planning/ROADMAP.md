@@ -80,10 +80,11 @@ Plans:
   2. Killing a Firecrawl/Exa/Tavily API endpoint (simulated via mock raising transient error) triggers exponential backoff retries visible in logs before the call succeeds or exhausts retries
   3. Every agent.run() call creates a LangSmith span with phase, agent_name, and iteration metadata tags (visible when LangSmith is configured; no-op when not)
   4. After harvest, every HarvestPage in HarvestResult.pages has detected_version populated when the content contains a semver string
-**Plans:** 1 plan
+**Plans:** 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md -- Wire budget recording, apply @api_retry, apply @traceable_agent, fix version detection persistence
+- [ ] 04-01-PLAN.md -- Extend unified retry to all SDKs, apply to strategy functions, fix version detection persistence
+- [ ] 04-02-PLAN.md -- Wire budget recording in agents and conductor, apply dynamic tracing decoration
 
 ## Progress
 
@@ -95,4 +96,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Foundation | 3/3 | Complete | 2026-03-05 |
 | 2. Research Engine | 3/3 | Complete | 2026-03-05 |
 | 3. Output Pipeline | 3/3 | Complete | 2026-03-05 |
-| 4. Integration Wiring | 0/1 | Not started | - |
+| 4. Integration Wiring | 0/2 | Not started | - |
