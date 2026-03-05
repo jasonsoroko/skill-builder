@@ -83,8 +83,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 04-01-PLAN.md -- Extend unified retry to all SDKs, apply to strategy functions, fix version detection persistence
-- [ ] 04-02-PLAN.md -- Wire budget recording in agents and conductor, apply dynamic tracing decoration
+- [x] 04-01-PLAN.md -- Extend unified retry to all SDKs, apply to strategy functions, fix version detection persistence
+- [x] 04-02-PLAN.md -- Wire budget recording in agents and conductor, apply dynamic tracing decoration
 
 ## Progress
 

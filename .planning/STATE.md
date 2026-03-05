@@ -108,6 +108,10 @@ Recent decisions affecting current work:
 - [04-01]: Exa retry on requests.ConnectionError/Timeout only -- not generic ValueError (avoids retrying auth errors)
 - [04-01]: Retry callback uses print() for CLI visibility per locked decision
 - [04-01]: Usage accumulation as getattr pattern -- no structural changes to result models
+- [04-02]: Usage metadata attached as dynamic _usage_meta attribute on Pydantic results (avoids schema changes)
+- [04-02]: Tracing applied dynamically at dispatch time for correct per-call metadata with iteration counts
+- [04-02]: Budget recording centralized in conductor._run_phase after agent.run() returns
+- [04-02]: ValidatorAgent accumulates usage from all 3 parallel LLM evaluator results
 
 ### Pending Todos
 
@@ -121,6 +125,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T22:30:40Z
-Stopped at: Completed 04-01-PLAN.md
-Resume file: .planning/phases/04-integration-wiring/04-02-PLAN.md
+Last session: 2026-03-05T22:31:00Z
+Stopped at: All plans complete -- v1.0 milestone finished
+Resume file: N/A

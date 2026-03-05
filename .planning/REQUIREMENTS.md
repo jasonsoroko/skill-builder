@@ -14,7 +14,7 @@
 - [x] **CORE-05**: Pipeline state persists to JSON at every phase boundary in `.skill-builder/state/{tool_name}.json`
 - [x] **CORE-06**: Pipeline can resume from any checkpoint after failure
 - [x] **CORE-07**: Dry-run mode prints fetch plan and estimated API cost, then exits
-- [ ] **CORE-08**: Global token budget cap prevents runaway costs in feedback loops
+- [x] **CORE-08**: Global token budget cap prevents runaway costs in feedback loops
 - [x] **CORE-09**: CLI entry point via Click accepts brief file path and options (dry-run, resume, verbose)
 - [x] **CORE-10**: Rich CLI progress output shows current phase, agent activity, and completion status
 
@@ -60,7 +60,7 @@
 ### Observability
 
 - [x] **OBS-01**: All Anthropic API calls are wrapped with LangSmith `@traceable` decorator
-- [ ] **OBS-02**: Each agent run includes metadata tags for phase, agent name, and iteration number
+- [x] **OBS-02**: Each agent run includes metadata tags for phase, agent name, and iteration number
 - [x] **OBS-03**: Cost and token tracking is fully offloaded to LangSmith (no local tracking)
 
 ### Packaging
@@ -110,7 +110,7 @@
 | CORE-05 | Phase 1 | Complete |
 | CORE-06 | Phase 1 | Complete |
 | CORE-07 | Phase 1 | Complete |
-| CORE-08 | Phase 4 | Pending |
+| CORE-08 | Phase 4 | Complete |
 | CORE-09 | Phase 1 | Complete |
 | CORE-10 | Phase 3 | Complete |
 | HARV-01 | Phase 2 | Complete |
@@ -141,7 +141,7 @@
 | VAL-05 | Phase 3 | Complete |
 | VAL-06 | Phase 3 | Complete |
 | OBS-01 | Phase 1 | Complete |
-| OBS-02 | Phase 4 | Pending |
+| OBS-02 | Phase 4 | Complete |
 | OBS-03 | Phase 1 | Complete |
 | PKG-01 | Phase 3 | Complete |
 | PKG-02 | Phase 3 | Complete |
