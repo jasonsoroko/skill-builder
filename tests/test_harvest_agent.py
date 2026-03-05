@@ -569,3 +569,303 @@ class TestHarvestAgentGitHubDiscovery:
 
         # Should have github page + docs page + at least the docs seed page
         assert result.total_pages >= 2
+
+
+class TestVersionPersistence:
+    """Test that version detection persists detected_version on HarvestPage objects."""
+
+    @pytest.mark.asyncio
+    async def test_pages_with_semver_have_detected_version_populated(self) -> None:
+        """After harvest, pages containing semver strings have detected_version set."""
+        from skill_builder.agents.harvest import HarvestAgent
+
+        brief = _make_brief()
+        state = _make_state()
+        queries = _make_queries()
+
+        # Page with a semver string in content
+        versioned_page = _make_page(
+            "https://docs.test.dev/changelog",
+            "crawl",
+            "Released Version: 2.3.1 with new features",
+        )
+
+        mock_client = MagicMock()
+
+        with (
+            patch(
+                "skill_builder.agents.harvest.generate_search_queries",
+                return_value=queries,
+            ),
+            patch(
+                "skill_builder.agents.harvest.route_url",
+                new_callable=AsyncMock,
+                return_value=[versioned_page],
+            ),
+            patch(
+                "skill_builder.agents.harvest.exa_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.tavily_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.deduplicate",
+                side_effect=lambda pages: pages,
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_version_conflicts",
+                return_value=([], []),
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_saturation",
+                new_callable=AsyncMock,
+                return_value=SaturationResult(is_saturated=True, missing_capabilities=[]),
+            ),
+        ):
+            agent = HarvestAgent(client=mock_client)
+            result = agent.run(brief=brief, state=state)
+
+        # The page with semver content should have detected_version populated
+        assert result.pages[0].detected_version is not None
+        assert result.pages[0].detected_version == "2.3.1"
+
+    @pytest.mark.asyncio
+    async def test_pages_without_semver_have_detected_version_none(self) -> None:
+        """After harvest, pages without semver strings retain detected_version=None."""
+        from skill_builder.agents.harvest import HarvestAgent
+
+        brief = _make_brief()
+        state = _make_state()
+        queries = _make_queries()
+
+        # Page without any semver string
+        plain_page = _make_page(
+            "https://docs.test.dev/guide",
+            "crawl",
+            "This is a guide with no version numbers",
+        )
+
+        mock_client = MagicMock()
+
+        with (
+            patch(
+                "skill_builder.agents.harvest.generate_search_queries",
+                return_value=queries,
+            ),
+            patch(
+                "skill_builder.agents.harvest.route_url",
+                new_callable=AsyncMock,
+                return_value=[plain_page],
+            ),
+            patch(
+                "skill_builder.agents.harvest.exa_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.tavily_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.deduplicate",
+                side_effect=lambda pages: pages,
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_version_conflicts",
+                return_value=([], []),
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_saturation",
+                new_callable=AsyncMock,
+                return_value=SaturationResult(is_saturated=True, missing_capabilities=[]),
+            ),
+        ):
+            agent = HarvestAgent(client=mock_client)
+            result = agent.run(brief=brief, state=state)
+
+        assert result.pages[0].detected_version is None
+
+    @pytest.mark.asyncio
+    async def test_enumerate_fix_updates_list_in_place(self) -> None:
+        """Version detection uses enumerate to update pages list (not loop variable rebinding)."""
+        from skill_builder.agents.harvest import HarvestAgent
+
+        brief = _make_brief()
+        state = _make_state()
+        queries = _make_queries()
+
+        # Mix of versioned and unversioned pages
+        page_v = _make_page("https://docs.test.dev/v1", "crawl", "SDK v3.0.0 released")
+        page_no_v = _make_page("https://docs.test.dev/intro", "crawl", "No versions here")
+
+        mock_client = MagicMock()
+
+        with (
+            patch(
+                "skill_builder.agents.harvest.generate_search_queries",
+                return_value=queries,
+            ),
+            patch(
+                "skill_builder.agents.harvest.route_url",
+                new_callable=AsyncMock,
+                return_value=[page_v, page_no_v],
+            ),
+            patch(
+                "skill_builder.agents.harvest.exa_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.tavily_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.deduplicate",
+                side_effect=lambda pages: pages,
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_version_conflicts",
+                return_value=([], []),
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_saturation",
+                new_callable=AsyncMock,
+                return_value=SaturationResult(is_saturated=True, missing_capabilities=[]),
+            ),
+        ):
+            agent = HarvestAgent(client=mock_client)
+            result = agent.run(brief=brief, state=state)
+
+        # First page should have detected_version (enumerate fix)
+        assert result.pages[0].detected_version == "3.0.0"
+        # Second page should NOT have detected_version
+        assert result.pages[1].detected_version is None
+
+
+class TestUsageAccumulation:
+    """Test that HarvestAgent accumulates _usage_meta from sub-calls."""
+
+    @pytest.mark.asyncio
+    async def test_accumulates_usage_from_query_generator_and_saturation(self) -> None:
+        """When query_generator and saturation return _usage_meta, HarvestResult has accumulated totals."""
+        from skill_builder.agents.harvest import HarvestAgent
+
+        brief = _make_brief()
+        state = _make_state()
+
+        # Create queries result with _usage_meta
+        queries = _make_queries()
+        queries._usage_meta = {  # type: ignore[attr-defined]
+            "model": "claude-sonnet-4-6",
+            "input_tokens": 100,
+            "output_tokens": 50,
+        }
+
+        # Create saturation result with _usage_meta
+        sat_result = SaturationResult(is_saturated=True, missing_capabilities=[])
+        sat_result._usage_meta = {  # type: ignore[attr-defined]
+            "model": "claude-sonnet-4-6",
+            "input_tokens": 200,
+            "output_tokens": 80,
+        }
+
+        mock_client = MagicMock()
+
+        with (
+            patch(
+                "skill_builder.agents.harvest.generate_search_queries",
+                return_value=queries,
+            ),
+            patch(
+                "skill_builder.agents.harvest.route_url",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.exa_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.tavily_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.deduplicate",
+                side_effect=lambda pages: pages,
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_version_conflicts",
+                return_value=([], []),
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_saturation",
+                new_callable=AsyncMock,
+                return_value=sat_result,
+            ),
+        ):
+            agent = HarvestAgent(client=mock_client)
+            result = agent.run(brief=brief, state=state)
+
+        usage = getattr(result, "_usage_meta", None)
+        assert usage is not None
+        assert usage["input_tokens"] == 300  # 100 + 200
+        assert usage["output_tokens"] == 130  # 50 + 80
+        assert usage["model"] == "claude-sonnet-4-6"
+
+    @pytest.mark.asyncio
+    async def test_no_usage_when_subcalls_have_none(self) -> None:
+        """When sub-calls have no _usage_meta, HarvestResult has no _usage_meta."""
+        from skill_builder.agents.harvest import HarvestAgent
+
+        brief = _make_brief()
+        state = _make_state()
+        queries = _make_queries()  # No _usage_meta attr
+
+        mock_client = MagicMock()
+
+        with (
+            patch(
+                "skill_builder.agents.harvest.generate_search_queries",
+                return_value=queries,
+            ),
+            patch(
+                "skill_builder.agents.harvest.route_url",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.exa_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.tavily_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.agents.harvest.deduplicate",
+                side_effect=lambda pages: pages,
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_version_conflicts",
+                return_value=([], []),
+            ),
+            patch(
+                "skill_builder.agents.harvest.check_saturation",
+                new_callable=AsyncMock,
+                return_value=SaturationResult(is_saturated=True, missing_capabilities=[]),
+            ),
+        ):
+            agent = HarvestAgent(client=mock_client)
+            result = agent.run(brief=brief, state=state)
+
+        assert getattr(result, "_usage_meta", None) is None
