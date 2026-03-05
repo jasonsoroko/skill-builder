@@ -14,7 +14,7 @@ Covers:
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -83,21 +83,6 @@ class TestHappyPath:
     ) -> None:
         """Conductor visits every expected phase in order on happy path."""
         result = conductor.run()
-        # On happy path (gap sufficient, validation passes), these phases are visited:
-        expected_phases = [
-            PipelinePhase.INTAKE,
-            PipelinePhase.HARVESTING,
-            PipelinePhase.ORGANIZING,
-            PipelinePhase.GAP_ANALYZING,
-            # No RE_HARVESTING on happy path
-            PipelinePhase.LEARNING,
-            PipelinePhase.MAPPING,
-            PipelinePhase.DOCUMENTING,
-            PipelinePhase.VALIDATING,
-            # No RE_PRODUCING on happy path
-            PipelinePhase.PACKAGING,
-            PipelinePhase.COMPLETE,
-        ]
         assert result.phase == PipelinePhase.COMPLETE
         # gap_loop_count should be 0 (no re-harvest needed)
         assert result.gap_loop_count == 0
@@ -270,8 +255,13 @@ class TestResumeFromCheckpoint:
     def test_resume_from_organizing(
         self, brief: SkillBrief, store: CheckpointStore, budget: TokenBudget
     ) -> None:
-        """Conductor resumes from ORGANIZING, skipping INTAKE and HARVESTING."""
-        # Save state at ORGANIZING phase
+        """Conductor resumes from ORGANIZING, skipping INTAKE, HARVESTING, and ORGANIZING.
+
+        When the checkpoint says phase=ORGANIZING, it means the organizer agent
+        already completed (checkpoint is saved AFTER the agent runs). The conductor
+        resumes from the NEXT phase (GAP_ANALYZING).
+        """
+        # Save state at ORGANIZING phase (already completed)
         saved_state = PipelineState(
             brief_name="test-skill",
             phase=PipelinePhase.ORGANIZING,
@@ -296,11 +286,16 @@ class TestResumeFromCheckpoint:
                 called_agents.append("organizer")
                 return StubOrganizerAgent().run()
 
+        class TrackingGapAnalyzer:
+            def run(self, **kwargs):
+                called_agents.append("gap_analyzer")
+                return StubGapAnalyzerAgent().run()
+
         agents = {
             "intake": TrackingIntake(),
             "harvest": TrackingHarvest(),
             "organizer": TrackingOrganizer(),
-            "gap_analyzer": StubGapAnalyzerAgent(),
+            "gap_analyzer": TrackingGapAnalyzer(),
             "learner": StubLearnerAgent(),
             "mapper": StubMapperAgent(),
             "documenter": StubDocumenterAgent(),
@@ -312,12 +307,12 @@ class TestResumeFromCheckpoint:
         result = conductor.run(state=saved_state)
 
         assert result.phase == PipelinePhase.COMPLETE
-        # Intake and Harvest should NOT have been called (already past those phases)
+        # Intake, Harvest, and Organizer should NOT have been called (already past)
         assert "intake" not in called_agents
         assert "harvest" not in called_agents
-        # Organizer should have been called (we resumed at ORGANIZING, which means
-        # we need to run the organizer agent for this phase)
-        assert "organizer" in called_agents
+        assert "organizer" not in called_agents
+        # Gap analyzer should have been called (first phase after ORGANIZING)
+        assert "gap_analyzer" in called_agents
 
 
 class TestBudgetExceeded:
