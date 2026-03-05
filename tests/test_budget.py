@@ -44,7 +44,7 @@ class TestTokenBudget:
         from skill_builder.budget import TokenBudget
 
         budget = TokenBudget(budget_usd=25.0)
-        budget.record_usage("claude-haiku-4-5", input_tokens=1_000_000, output_tokens=1_000_000)
+        budget.record_usage("claude-haiku-4-5-20251001", input_tokens=1_000_000, output_tokens=1_000_000)
 
         assert budget.total_cost_usd == 6.00  # $1 + $5
 
@@ -117,7 +117,7 @@ class TestTokenBudget:
 
         assert "claude-sonnet-4-6" in MODEL_PRICING
         assert "claude-opus-4-6" in MODEL_PRICING
-        assert "claude-haiku-4-5" in MODEL_PRICING
+        assert "claude-haiku-4-5-20251001" in MODEL_PRICING
 
     def test_model_pricing_values(self) -> None:
         """MODEL_PRICING has correct per-MTok pricing."""
@@ -127,5 +127,5 @@ class TestTokenBudget:
         assert MODEL_PRICING["claude-sonnet-4-6"]["output"] == 15.00
         assert MODEL_PRICING["claude-opus-4-6"]["input"] == 5.00
         assert MODEL_PRICING["claude-opus-4-6"]["output"] == 25.00
-        assert MODEL_PRICING["claude-haiku-4-5"]["input"] == 1.00
-        assert MODEL_PRICING["claude-haiku-4-5"]["output"] == 5.00
+        assert MODEL_PRICING["claude-haiku-4-5-20251001"]["input"] == 1.00
+        assert MODEL_PRICING["claude-haiku-4-5-20251001"]["output"] == 5.00

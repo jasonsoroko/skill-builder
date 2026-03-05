@@ -28,7 +28,7 @@ async def _firecrawl_crawl_with_retry(fc, url: str, max_pages: int):
         before_sleep=_make_retry_callback(),
     ):
         with attempt:
-            return await fc.crawl(url, limit=max_pages, scrape_options={"formats": ["markdown"]})
+            return await fc.crawl(url=url, limit=max_pages, scrape_options={"formats": ["markdown"]})
 
 
 async def firecrawl_crawl(url: str, *, max_pages: int = 50) -> list[HarvestPage]:
