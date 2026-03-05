@@ -602,6 +602,143 @@ class TestFocusedKwargsDispatch:
         assert call_kwargs["categorized_research"] == categorized
         assert call_kwargs["gap_report"] == gap_report
 
+    def test_validating_passes_categorized_research_and_iteration(
+        self, brief: SkillBrief, store: CheckpointStore, budget: TokenBudget
+    ) -> None:
+        """VALIDATING phase passes categorized_research and iteration to agent."""
+        from unittest.mock import MagicMock
+
+        mock_agent = MagicMock()
+        mock_agent.run.return_value = StubValidatorAgent().run()
+
+        agents = {
+            "intake": StubIntakeAgent(),
+            "harvest": StubHarvestAgent(),
+            "organizer": StubOrganizerAgent(),
+            "gap_analyzer": StubGapAnalyzerAgent(),
+            "learner": StubLearnerAgent(),
+            "mapper": StubMapperAgent(),
+            "documenter": StubDocumenterAgent(),
+            "validator": mock_agent,
+            "packager": StubPackagerAgent(),
+        }
+        conductor = Conductor(brief=brief, store=store, budget=budget, agents=agents)
+
+        skill_draft = {"content": "# Skill", "line_count": 1, "has_frontmatter": False}
+        setup_draft = {"content": "# Setup", "has_prerequisites": True, "has_quick_start": True}
+        knowledge_model = {"canonical_use_cases": [], "dependencies": []}
+        categorized = {"categories": [], "source_count": 0}
+
+        state = PipelineState(
+            brief_name="test-skill",
+            phase=PipelinePhase.VALIDATING,
+            skill_draft=skill_draft,
+            setup_draft=setup_draft,
+            knowledge_model=knowledge_model,
+            categorized_research=categorized,
+            validation_loop_count=0,
+        )
+        conductor._run_phase(PipelinePhase.VALIDATING, state)
+
+        mock_agent.run.assert_called_once()
+        call_kwargs = mock_agent.run.call_args.kwargs
+        assert "skill_draft" in call_kwargs
+        assert "setup_draft" in call_kwargs
+        assert "knowledge_model" in call_kwargs
+        assert "brief" in call_kwargs
+        assert "categorized_research" in call_kwargs
+        assert call_kwargs["categorized_research"] == categorized
+        assert "iteration" in call_kwargs
+        assert call_kwargs["iteration"] == 1  # validation_loop_count 0 + 1
+
+    def test_re_producing_passes_failed_dimensions(
+        self, brief: SkillBrief, store: CheckpointStore, budget: TokenBudget
+    ) -> None:
+        """RE_PRODUCING phase passes failed_dimensions from last evaluation."""
+        from unittest.mock import MagicMock
+
+        mock_agent = MagicMock()
+        mock_agent.run.return_value = StubMapperAgent().run()
+
+        agents = {
+            "intake": StubIntakeAgent(),
+            "harvest": StubHarvestAgent(),
+            "organizer": StubOrganizerAgent(),
+            "gap_analyzer": StubGapAnalyzerAgent(),
+            "learner": StubLearnerAgent(),
+            "mapper": mock_agent,
+            "documenter": StubDocumenterAgent(),
+            "validator": StubValidatorAgent(),
+            "packager": StubPackagerAgent(),
+        }
+        conductor = Conductor(brief=brief, store=store, budget=budget, agents=agents)
+
+        knowledge_model = {"canonical_use_cases": [], "dependencies": []}
+        eval_results = [
+            {
+                "dimensions": [
+                    {"name": "compactness", "score": 10, "feedback": "OK", "passed": True},
+                    {"name": "api_accuracy", "score": 5, "feedback": "Wrong endpoints", "passed": False},
+                ],
+                "overall_pass": False,
+                "iteration": 1,
+            }
+        ]
+
+        state = PipelineState(
+            brief_name="test-skill",
+            phase=PipelinePhase.RE_PRODUCING,
+            knowledge_model=knowledge_model,
+            evaluation_results=eval_results,
+        )
+        conductor._run_phase(PipelinePhase.RE_PRODUCING, state)
+
+        mock_agent.run.assert_called_once()
+        call_kwargs = mock_agent.run.call_args.kwargs
+        assert "knowledge_model" in call_kwargs
+        assert "brief" in call_kwargs
+        assert "failed_dimensions" in call_kwargs
+        # Only the failed dimension should be passed
+        assert len(call_kwargs["failed_dimensions"]) == 1
+        assert call_kwargs["failed_dimensions"][0]["name"] == "api_accuracy"
+
+    def test_re_producing_omits_failed_dimensions_when_no_evals(
+        self, brief: SkillBrief, store: CheckpointStore, budget: TokenBudget
+    ) -> None:
+        """RE_PRODUCING kwargs omit failed_dimensions when no evaluation results exist."""
+        from unittest.mock import MagicMock
+
+        mock_agent = MagicMock()
+        mock_agent.run.return_value = StubMapperAgent().run()
+
+        agents = {
+            "intake": StubIntakeAgent(),
+            "harvest": StubHarvestAgent(),
+            "organizer": StubOrganizerAgent(),
+            "gap_analyzer": StubGapAnalyzerAgent(),
+            "learner": StubLearnerAgent(),
+            "mapper": mock_agent,
+            "documenter": StubDocumenterAgent(),
+            "validator": StubValidatorAgent(),
+            "packager": StubPackagerAgent(),
+        }
+        conductor = Conductor(brief=brief, store=store, budget=budget, agents=agents)
+
+        knowledge_model = {"canonical_use_cases": [], "dependencies": []}
+
+        state = PipelineState(
+            brief_name="test-skill",
+            phase=PipelinePhase.RE_PRODUCING,
+            knowledge_model=knowledge_model,
+        )
+        conductor._run_phase(PipelinePhase.RE_PRODUCING, state)
+
+        mock_agent.run.assert_called_once()
+        call_kwargs = mock_agent.run.call_args.kwargs
+        assert "knowledge_model" in call_kwargs
+        assert "brief" in call_kwargs
+        assert "failed_dimensions" not in call_kwargs
+
 
 class TestDefaultAgents:
     """Test that _default_agents returns correct agent types."""
@@ -621,14 +758,24 @@ class TestDefaultAgents:
         assert isinstance(agents["gap_analyzer"], GapAnalyzerAgent)
         assert isinstance(agents["learner"], LearnerAgent)
 
-    def test_stub_agents_for_phase3(self) -> None:
-        """_default_agents uses stubs for mapper, documenter, validator, packager."""
+    def test_real_agents_for_phase3(self) -> None:
+        """_default_agents uses real agents for mapper, documenter, validator."""
+        from skill_builder.agents.documenter import DocumenterAgent
+        from skill_builder.agents.mapper import MapperAgent
+        from skill_builder.agents.validator import ValidatorAgent
+        from skill_builder.conductor import _default_agents
+
+        agents = _default_agents()
+
+        assert isinstance(agents["mapper"], MapperAgent)
+        assert isinstance(agents["documenter"], DocumenterAgent)
+        assert isinstance(agents["validator"], ValidatorAgent)
+
+    def test_stub_agents_for_remaining(self) -> None:
+        """_default_agents uses stubs for intake and packager (not yet implemented)."""
         from skill_builder.conductor import _default_agents
 
         agents = _default_agents()
 
         assert isinstance(agents["intake"], StubIntakeAgent)
-        assert isinstance(agents["mapper"], StubMapperAgent)
-        assert isinstance(agents["documenter"], StubDocumenterAgent)
-        assert isinstance(agents["validator"], StubValidatorAgent)
         assert isinstance(agents["packager"], StubPackagerAgent)

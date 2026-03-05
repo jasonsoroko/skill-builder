@@ -14,17 +14,17 @@ import logging
 import time
 from typing import Any
 
+from skill_builder.agents.documenter import DocumenterAgent
 from skill_builder.agents.gap_analyzer import GapAnalyzerAgent
 from skill_builder.agents.harvest import HarvestAgent
 from skill_builder.agents.learner import LearnerAgent
+from skill_builder.agents.mapper import MapperAgent
 from skill_builder.agents.organizer import OrganizerAgent
 from skill_builder.agents.stubs import (
-    StubDocumenterAgent,
     StubIntakeAgent,
-    StubMapperAgent,
     StubPackagerAgent,
-    StubValidatorAgent,
 )
+from skill_builder.agents.validator import ValidatorAgent
 from skill_builder.budget import TokenBudget
 from skill_builder.checkpoint import CheckpointStore
 from skill_builder.models.brief import SkillBrief
@@ -41,8 +41,9 @@ _CONDITIONAL = "conditional"
 def _default_agents() -> dict[str, Any]:
     """Create the default agent set.
 
-    Phase 2 phases use real agent implementations.
-    Phase 3 phases (and intake) use stubs until implemented.
+    Phase 2 agents (harvest, organizer, gap_analyzer, learner) use real implementations.
+    Phase 3 agents (mapper, documenter, validator) use real implementations.
+    Intake and packager still use stubs until implemented.
     """
     return {
         "intake": StubIntakeAgent(),
@@ -50,9 +51,9 @@ def _default_agents() -> dict[str, Any]:
         "organizer": OrganizerAgent(),
         "gap_analyzer": GapAnalyzerAgent(),
         "learner": LearnerAgent(),
-        "mapper": StubMapperAgent(),
-        "documenter": StubDocumenterAgent(),
-        "validator": StubValidatorAgent(),
+        "mapper": MapperAgent(),
+        "documenter": DocumenterAgent(),
+        "validator": ValidatorAgent(),
         "packager": StubPackagerAgent(),
     }
 
@@ -263,13 +264,25 @@ class Conductor:
                 "setup_draft": state.setup_draft,
                 "knowledge_model": state.knowledge_model,
                 "brief": self.brief,
+                "categorized_research": state.categorized_research,
+                "iteration": state.validation_loop_count + 1,
             }
 
         if phase == PipelinePhase.RE_PRODUCING:
-            return {
+            kwargs: dict[str, Any] = {
                 "knowledge_model": state.knowledge_model,
                 "brief": self.brief,
             }
+            # Extract failed dimensions from last evaluation
+            if state.evaluation_results:
+                last_eval = state.evaluation_results[-1]
+                failed = [
+                    d for d in last_eval.get("dimensions", [])
+                    if not d.get("passed", True)
+                ]
+                if failed:
+                    kwargs["failed_dimensions"] = failed
+            return kwargs
 
         if phase == PipelinePhase.PACKAGING:
             return {
