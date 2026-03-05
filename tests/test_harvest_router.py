@@ -73,7 +73,7 @@ class TestRouteUrl:
         )
         mock_crawl = AsyncMock(return_value=[mock_page])
 
-        with patch.object(router, "_firecrawl_crawl_placeholder", mock_crawl):
+        with patch.object(router, "firecrawl_crawl", mock_crawl):
             # Create a seed with a known type but override the map to test fallback
             seed = SeedUrl(url="https://example.com", type="docs")
             # Remove docs from map to trigger fallback
@@ -113,7 +113,7 @@ class TestApiSchemaExtract:
 
     @pytest.mark.asyncio
     async def test_api_schema_extract_falls_back_to_crawl(self) -> None:
-        """api_schema_extract falls back to firecrawl_crawl when search finds nothing."""
+        """api_schema_extract falls back to firecrawl_crawl when exa search returns nothing."""
         from skill_builder.harvest.router import api_schema_extract
 
         mock_page = HarvestPage(
@@ -123,10 +123,17 @@ class TestApiSchemaExtract:
             source_type="crawl",
         )
 
-        with patch(
-            "skill_builder.harvest.router._firecrawl_crawl_placeholder",
-            new_callable=AsyncMock,
-            return_value=[mock_page],
+        with (
+            patch(
+                "skill_builder.harvest.router.exa_search",
+                new_callable=AsyncMock,
+                return_value=[],
+            ),
+            patch(
+                "skill_builder.harvest.router.firecrawl_crawl",
+                new_callable=AsyncMock,
+                return_value=[mock_page],
+            ),
         ):
             result = await api_schema_extract("https://api.example.com", max_pages=10)
 
