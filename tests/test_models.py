@@ -15,7 +15,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from skill_builder.models.brief import SeedUrl, SkillBrief
+from skill_builder.models.brief import SkillBrief
 from skill_builder.models.state import PipelinePhase, PipelineState
 
 
@@ -192,23 +192,23 @@ class TestModelExports:
 
     def test_models_init_reexports(self) -> None:
         """Models __init__ re-exports all primary models."""
-        from skill_builder.models import (
-            CategorizedResearch,
-            EvaluationDimension,
-            EvaluationResult,
-            GapReport,
-            HarvestPage,
-            HarvestResult,
-            KnowledgeModel,
-            PipelinePhase,
-            PipelineState,
-            ResearchCategory,
-            SeedUrl,
-            SetupDraft,
-            SkillBrief,
-            SkillDraft,
-        )
+        import skill_builder.models as models
 
-        assert SkillBrief is not None
-        assert PipelineState is not None
-        assert PipelinePhase is not None
+        expected_exports = [
+            "CategorizedResearch",
+            "EvaluationDimension",
+            "EvaluationResult",
+            "GapReport",
+            "HarvestPage",
+            "HarvestResult",
+            "KnowledgeModel",
+            "PipelinePhase",
+            "PipelineState",
+            "ResearchCategory",
+            "SeedUrl",
+            "SetupDraft",
+            "SkillBrief",
+            "SkillDraft",
+        ]
+        for name in expected_exports:
+            assert hasattr(models, name), f"models.__init__ missing export: {name}"
