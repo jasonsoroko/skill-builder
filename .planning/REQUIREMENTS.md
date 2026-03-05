@@ -11,10 +11,10 @@
 - [ ] **CORE-02**: Conductor implements a deterministic state machine with explicit phase transitions (intake → harvest → synthesis → production → validation → packaging)
 - [ ] **CORE-03**: Conductor routes Gap Analyzer failures back to harvest with recommended search queries (max 2 iterations)
 - [ ] **CORE-04**: Conductor routes validation failures back to production with evaluator feedback (max 2 iterations)
-- [ ] **CORE-05**: Pipeline state persists to JSON at every phase boundary in `.skill-builder/state/{tool_name}.json`
-- [ ] **CORE-06**: Pipeline can resume from any checkpoint after failure
+- [x] **CORE-05**: Pipeline state persists to JSON at every phase boundary in `.skill-builder/state/{tool_name}.json`
+- [x] **CORE-06**: Pipeline can resume from any checkpoint after failure
 - [ ] **CORE-07**: Dry-run mode prints fetch plan and estimated API cost, then exits
-- [ ] **CORE-08**: Global token budget cap prevents runaway costs in feedback loops
+- [x] **CORE-08**: Global token budget cap prevents runaway costs in feedback loops
 - [ ] **CORE-09**: CLI entry point via Click accepts brief file path and options (dry-run, resume, verbose)
 - [ ] **CORE-10**: Rich CLI progress output shows current phase, agent activity, and completion status
 
@@ -59,9 +59,9 @@
 
 ### Observability
 
-- [ ] **OBS-01**: All Anthropic API calls are wrapped with LangSmith `@traceable` decorator
-- [ ] **OBS-02**: Each agent run includes metadata tags for phase, agent name, and iteration number
-- [ ] **OBS-03**: Cost and token tracking is fully offloaded to LangSmith (no local tracking)
+- [x] **OBS-01**: All Anthropic API calls are wrapped with LangSmith `@traceable` decorator
+- [x] **OBS-02**: Each agent run includes metadata tags for phase, agent name, and iteration number
+- [x] **OBS-03**: Cost and token tracking is fully offloaded to LangSmith (no local tracking)
 
 ### Packaging
 
@@ -71,8 +71,8 @@
 
 ### Resilience
 
-- [ ] **RES-01**: Exponential backoff on all external API calls (Anthropic, Exa, Tavily, Firecrawl)
-- [ ] **RES-02**: LangSmith tracing errors never block the pipeline (wrapped at integration boundary)
+- [x] **RES-01**: Exponential backoff on all external API calls (Anthropic, Exa, Tavily, Firecrawl)
+- [x] **RES-02**: LangSmith tracing errors never block the pipeline (wrapped at integration boundary)
 - [ ] **RES-03**: Feedback loops have hard iteration caps (max 2 for gap analysis, max 2 for validation)
 
 ## v2 Requirements
@@ -107,10 +107,10 @@
 | CORE-02 | Phase 1 | Pending |
 | CORE-03 | Phase 1 | Pending |
 | CORE-04 | Phase 1 | Pending |
-| CORE-05 | Phase 1 | Pending |
-| CORE-06 | Phase 1 | Pending |
+| CORE-05 | Phase 1 | Complete |
+| CORE-06 | Phase 1 | Complete |
 | CORE-07 | Phase 1 | Pending |
-| CORE-08 | Phase 1 | Pending |
+| CORE-08 | Phase 1 | Complete |
 | CORE-09 | Phase 1 | Pending |
 | CORE-10 | Phase 3 | Pending |
 | HARV-01 | Phase 2 | Pending |
@@ -140,14 +140,14 @@
 | VAL-04 | Phase 3 | Pending |
 | VAL-05 | Phase 3 | Pending |
 | VAL-06 | Phase 3 | Pending |
-| OBS-01 | Phase 1 | Pending |
-| OBS-02 | Phase 1 | Pending |
-| OBS-03 | Phase 1 | Pending |
+| OBS-01 | Phase 1 | Complete |
+| OBS-02 | Phase 1 | Complete |
+| OBS-03 | Phase 1 | Complete |
 | PKG-01 | Phase 3 | Pending |
 | PKG-02 | Phase 3 | Pending |
 | PKG-03 | Phase 3 | Pending |
-| RES-01 | Phase 1 | Pending |
-| RES-02 | Phase 1 | Pending |
+| RES-01 | Phase 1 | Complete |
+| RES-02 | Phase 1 | Complete |
 | RES-03 | Phase 1 | Pending |
 
 **Coverage:**
