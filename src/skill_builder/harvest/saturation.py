@@ -82,6 +82,11 @@ If all capabilities have at least some coverage, set is_saturated=true."""
             messages=[{"role": "user", "content": prompt}],
         )
         result = response.parsed_output
+        result._usage_meta = {  # type: ignore[attr-defined]
+            "model": response.model,
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens,
+        }
         logger.info(
             "Saturation check result: saturated=%s, missing=%s",
             result.is_saturated,

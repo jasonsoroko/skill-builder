@@ -111,6 +111,15 @@ class ValidatorAgent:
         else:
             llm_dims = asyncio.run(_parallel())
 
+        # Accumulate usage metadata from all 3 LLM evaluator results
+        _accumulated_usage = {"model": "claude-opus-4-6", "input_tokens": 0, "output_tokens": 0}
+        for dim in llm_dims:
+            dim_meta = getattr(dim, "_usage_meta", None)
+            if dim_meta:
+                _accumulated_usage["input_tokens"] += dim_meta["input_tokens"]
+                _accumulated_usage["output_tokens"] += dim_meta["output_tokens"]
+                _accumulated_usage["model"] = dim_meta["model"]
+
         # Combine all 5 dimensions
         all_dims = heuristic_dims + llm_dims
         overall_pass = all(d.passed for d in all_dims)
@@ -121,8 +130,12 @@ class ValidatorAgent:
             overall_pass,
         )
 
-        return EvaluationResult(
+        eval_result = EvaluationResult(
             dimensions=all_dims,
             overall_pass=overall_pass,
             iteration=iteration,
         )
+        if _accumulated_usage["input_tokens"] > 0 or _accumulated_usage["output_tokens"] > 0:
+            eval_result._usage_meta = _accumulated_usage  # type: ignore[attr-defined]
+
+        return eval_result

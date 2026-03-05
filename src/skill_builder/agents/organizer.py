@@ -70,6 +70,11 @@ class OrganizerAgent:
         )
 
         result: CategorizedResearch = response.parsed_output
+        result._usage_meta = {  # type: ignore[attr-defined]
+            "model": response.model,
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens,
+        }
         logger.info(
             "OrganizerAgent: produced %d categories from %d sources",
             len(result.categories),

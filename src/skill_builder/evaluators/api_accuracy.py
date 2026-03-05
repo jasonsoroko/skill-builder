@@ -68,5 +68,12 @@ async def evaluate_api_accuracy(
     # Programmatic override: don't trust LLM threshold judgment
     dim = dim.model_copy(update={"name": "api_accuracy", "passed": dim.score >= 7})
 
+    # Attach usage metadata for budget tracking
+    dim._usage_meta = {  # type: ignore[attr-defined]
+        "model": response.model,
+        "input_tokens": response.usage.input_tokens,
+        "output_tokens": response.usage.output_tokens,
+    }
+
     logger.info("API accuracy: score=%d passed=%s", dim.score, dim.passed)
     return dim

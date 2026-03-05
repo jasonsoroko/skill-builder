@@ -215,6 +215,15 @@ class Conductor:
         result = agent.run(**kwargs)
         elapsed = time.monotonic() - start
 
+        # Record token usage if agent provides metadata
+        usage_meta = getattr(result, "_usage_meta", None)
+        if usage_meta:
+            self.budget.record_usage(
+                usage_meta["model"],
+                input_tokens=usage_meta["input_tokens"],
+                output_tokens=usage_meta["output_tokens"],
+            )
+
         # Store result in state based on phase
         self._store_result(phase, state, result)
 

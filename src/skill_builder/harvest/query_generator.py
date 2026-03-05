@@ -76,7 +76,13 @@ Generate one Tavily query per required capability
             output_format=GeneratedQueries,
             messages=[{"role": "user", "content": prompt}],
         )
-        return response.parsed_output
+        result = response.parsed_output
+        result._usage_meta = {  # type: ignore[attr-defined]
+            "model": response.model,
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens,
+        }
+        return result
     except Exception:
         logger.warning(
             "LLM query generation failed, falling back to template queries",
@@ -129,7 +135,13 @@ For each gap query, produce:
             output_format=GeneratedQueries,
             messages=[{"role": "user", "content": prompt}],
         )
-        return response.parsed_output
+        result = response.parsed_output
+        result._usage_meta = {  # type: ignore[attr-defined]
+            "model": response.model,
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens,
+        }
+        return result
     except Exception:
         logger.warning(
             "LLM gap query refinement failed, falling back to template queries",

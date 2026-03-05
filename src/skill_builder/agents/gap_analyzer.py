@@ -87,6 +87,11 @@ class GapAnalyzerAgent:
             )
 
         result: GapReport = response.parsed_output
+        result._usage_meta = {  # type: ignore[attr-defined]
+            "model": response.model,
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens,
+        }
         logger.info(
             "GapAnalyzerAgent: is_sufficient=%s, %d gaps found",
             result.is_sufficient,

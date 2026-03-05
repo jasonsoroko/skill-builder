@@ -73,6 +73,11 @@ class DocumenterAgent:
         )
 
         result: SetupDraft = response.parsed_output
+        result._usage_meta = {  # type: ignore[attr-defined]
+            "model": response.model,
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens,
+        }
         logger.info(
             "DocumenterAgent: produced setup draft (prerequisites=%s, quick_start=%s)",
             result.has_prerequisites,

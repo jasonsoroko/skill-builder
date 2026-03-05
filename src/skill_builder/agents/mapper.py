@@ -87,6 +87,11 @@ class MapperAgent:
         )
 
         result: SkillDraft = response.parsed_output
+        result._usage_meta = {  # type: ignore[attr-defined]
+            "model": response.model,
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens,
+        }
         logger.info(
             "MapperAgent: produced %d-line draft (frontmatter=%s, refs=%s)",
             result.line_count,
