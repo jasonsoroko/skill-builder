@@ -8,14 +8,14 @@
 ### Pipeline Core
 
 - [x] **CORE-01**: User can provide a structured skill brief (JSON) with seed URLs, tool category, scope, required capabilities, and deploy target
-- [ ] **CORE-02**: Conductor implements a deterministic state machine with explicit phase transitions (intake → harvest → synthesis → production → validation → packaging)
-- [ ] **CORE-03**: Conductor routes Gap Analyzer failures back to harvest with recommended search queries (max 2 iterations)
-- [ ] **CORE-04**: Conductor routes validation failures back to production with evaluator feedback (max 2 iterations)
+- [x] **CORE-02**: Conductor implements a deterministic state machine with explicit phase transitions (intake → harvest → synthesis → production → validation → packaging)
+- [x] **CORE-03**: Conductor routes Gap Analyzer failures back to harvest with recommended search queries (max 2 iterations)
+- [x] **CORE-04**: Conductor routes validation failures back to production with evaluator feedback (max 2 iterations)
 - [x] **CORE-05**: Pipeline state persists to JSON at every phase boundary in `.skill-builder/state/{tool_name}.json`
 - [x] **CORE-06**: Pipeline can resume from any checkpoint after failure
-- [ ] **CORE-07**: Dry-run mode prints fetch plan and estimated API cost, then exits
+- [x] **CORE-07**: Dry-run mode prints fetch plan and estimated API cost, then exits
 - [x] **CORE-08**: Global token budget cap prevents runaway costs in feedback loops
-- [ ] **CORE-09**: CLI entry point via Click accepts brief file path and options (dry-run, resume, verbose)
+- [x] **CORE-09**: CLI entry point via Click accepts brief file path and options (dry-run, resume, verbose)
 - [ ] **CORE-10**: Rich CLI progress output shows current phase, agent activity, and completion status
 
 ### Content Harvest
@@ -73,7 +73,7 @@
 
 - [x] **RES-01**: Exponential backoff on all external API calls (Anthropic, Exa, Tavily, Firecrawl)
 - [x] **RES-02**: LangSmith tracing errors never block the pipeline (wrapped at integration boundary)
-- [ ] **RES-03**: Feedback loops have hard iteration caps (max 2 for gap analysis, max 2 for validation)
+- [x] **RES-03**: Feedback loops have hard iteration caps (max 2 for gap analysis, max 2 for validation)
 
 ## v2 Requirements
 
@@ -104,14 +104,14 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CORE-01 | Phase 1 | Complete |
-| CORE-02 | Phase 1 | Pending |
-| CORE-03 | Phase 1 | Pending |
-| CORE-04 | Phase 1 | Pending |
+| CORE-02 | Phase 1 | Complete |
+| CORE-03 | Phase 1 | Complete |
+| CORE-04 | Phase 1 | Complete |
 | CORE-05 | Phase 1 | Complete |
 | CORE-06 | Phase 1 | Complete |
-| CORE-07 | Phase 1 | Pending |
+| CORE-07 | Phase 1 | Complete |
 | CORE-08 | Phase 1 | Complete |
-| CORE-09 | Phase 1 | Pending |
+| CORE-09 | Phase 1 | Complete |
 | CORE-10 | Phase 3 | Pending |
 | HARV-01 | Phase 2 | Pending |
 | HARV-02 | Phase 2 | Pending |
@@ -148,7 +148,7 @@
 | PKG-03 | Phase 3 | Pending |
 | RES-01 | Phase 1 | Complete |
 | RES-02 | Phase 1 | Complete |
-| RES-03 | Phase 1 | Pending |
+| RES-03 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 46 total
