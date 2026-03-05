@@ -1,0 +1,37 @@
+{
+  "name": "exa-tavily-firecrawl",
+  "description": "A skill for deep research crawling using Exa semantic search, Tavily web search, and Firecrawl site crawling together. Covers orchestrating all three tools for comprehensive knowledge gathering, deduplication, and parallel execution.",
+  "seed_urls": [
+    {
+      "url": "https://docs.exa.ai/",
+      "type": "docs"
+    },
+    {
+      "url": "https://docs.tavily.com/",
+      "type": "docs"
+    },
+    {
+      "url": "https://docs.firecrawl.dev/",
+      "type": "docs"
+    },
+    {
+      "url": "https://github.com/mendableai/firecrawl",
+      "type": "github"
+    },
+    {
+      "url": "https://docs.firecrawl.dev/api-reference/endpoint/scrape",
+      "type": "api_schema"
+    }
+  ],
+  "tool_category": "research",
+  "scope": "Using Exa, Tavily, and Firecrawl together for comprehensive research crawling",
+  "required_capabilities": [
+    "semantic search with Exa",
+    "web search with Tavily",
+    "site crawling with Firecrawl",
+    "parallel execution",
+    "result deduplication"
+  ],
+  "deploy_target": "user",
+  "target_api_version": null
+}
