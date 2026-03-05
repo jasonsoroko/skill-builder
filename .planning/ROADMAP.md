@@ -45,12 +45,12 @@ Plans:
   3. The Organizer agent produces structured categories (installation, core concepts, API surface, common errors, etc.) from raw harvested content, and the Gap Analyzer identifies any missing required capabilities
   4. When the Gap Analyzer finds gaps, the conductor loops back to harvest with targeted search queries, and the gap-harvest loop executes at most 2 iterations before proceeding
   5. The Learner agent produces a KnowledgeModel with all required fields (canonical use cases, parameters, gotchas, best practices, trigger phrases, etc.) and all agent outputs are Pydantic-validated via tool_use
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+- [ ] 02-01-PLAN.md -- Model extensions, dependencies, harvest utilities (router, dedup, version check, query generator)
+- [ ] 02-02-PLAN.md -- Extraction strategies (Firecrawl, GitHub, Exa, Tavily), saturation check, HarvestAgent
+- [ ] 02-03-PLAN.md -- Synthesis agents (Organizer, Gap Analyzer, Learner), conductor wiring
 
 ### Phase 3: Output Pipeline
 **Goal**: The pipeline takes a KnowledgeModel and produces a validated, packaged `.skill` file -- drafting SKILL.md and SETUP.md, running heuristic and LLM-as-judge evaluators, routing failures back to production, and assembling the final package with Rich CLI progress throughout
