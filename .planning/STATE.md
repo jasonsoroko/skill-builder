@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-03-05T17:01:00.000Z"
-last_activity: 2026-03-05 -- Plan 02-01 complete
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-05T17:13:05.929Z"
+last_activity: 2026-03-05 -- Plan 02-02 complete
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
-  percent: 44
+  completed_plans: 5
+  percent: 83
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 ## Current Position
 
 Phase: 2 of 3 (Research Engine)
-Plan: 1 of 3 in current phase
-Status: Plan 02-01 complete
-Last activity: 2026-03-05 -- Plan 02-01 complete
+Plan: 2 of 3 in current phase
+Status: Plan 02-02 complete
+Last activity: 2026-03-05 -- Plan 02-02 complete
 
-Progress: [████░░░░░░] 44%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [████░░░░░░] 44%
 - Trend: Stable
 
 *Updated after each plan completion*
+| Phase 02 P02 | 8 | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,10 @@ Recent decisions affecting current work:
 - [02-01]: Used model_copy() in deduplicate() to set content_hash without mutating original HarvestPage objects
 - [02-01]: Router uses mutable STRATEGY_MAP dict so Plan 02 can replace placeholders with real strategy functions
 - [02-01]: api_schema_extract is a named function (not lambda) for testability and future search logic
+- [Phase 02]: Used sync Exa/Tavily wrapped in asyncio.to_thread() over untested async variants
+- [Phase 02]: GitHub strategy returns tuple (pages, docs_urls) for docs site auto-discovery
+- [Phase 02]: Saturation pre-filter fails open on error (Gap Analyzer is real quality gate)
+- [Phase 02]: ThreadPoolExecutor bridge in HarvestAgent.run() for sync-to-async Protocol conformance
 
 ### Pending Todos
 
@@ -89,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T17:01:00.000Z
-Stopped at: Completed 02-01-PLAN.md
-Resume file: .planning/phases/02-research-engine/02-02-PLAN.md
+Last session: 2026-03-05T17:13:05.927Z
+Stopped at: Completed 02-02-PLAN.md
+Resume file: None
