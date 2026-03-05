@@ -62,12 +62,12 @@ Plans:
   3. Heuristic evaluators catch compactness violations (over 500 lines) and syntax errors (invalid Python in code blocks), and LLM-as-judge evaluators (Opus) score API accuracy, completeness, and trigger quality -- any score below 7 triggers feedback routing back to production (max 2 iterations)
   4. The Packager assembles the output folder (SKILL.md, SETUP.md, references/, scripts/, assets/, LICENSE.txt) and produces a `.skill` file matching the brief's deploy target (repo, user, or package), with installation verification instructions printed after completion
   5. Rich CLI output shows the current phase, active agent, iteration counts, and evaluator scores throughout the entire pipeline run
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [ ] 03-01-PLAN.md -- Production agents (Mapper, Documenter), SkillDraft model extension, heuristic evaluators (compactness, syntax)
+- [ ] 03-02-PLAN.md -- LLM-as-judge evaluators (API accuracy, completeness, trigger quality), ValidatorAgent, conductor feedback wiring
+- [ ] 03-03-PLAN.md -- PackagerAgent, Rich CLI progress display, conductor and CLI integration
 
 ## Progress
 
