@@ -15,6 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Foundation** - Conductor state machine, Pydantic models, checkpoint persistence, CLI scaffold, tracing, and resilience patterns
 - [ ] **Phase 2: Research Engine** - URL classification, multi-source content extraction, parallel harvest, agent synthesis with gap analysis loopback
 - [ ] **Phase 3: Output Pipeline** - Production agents, heuristic and LLM-as-judge validation, feedback routing, packaging, and Rich CLI polish
+- [ ] **Phase 4: Integration Wiring** - Wire budget recording, retry decorators, tracing decorators, and fix version detection persistence (gap closure from audit)
 
 ## Phase Details
 
@@ -69,13 +70,29 @@ Plans:
 - [ ] 03-02-PLAN.md -- LLM-as-judge evaluators (API accuracy, completeness, trigger quality), ValidatorAgent, conductor feedback wiring
 - [ ] 03-03-PLAN.md -- PackagerAgent, Rich CLI progress display, conductor and CLI integration
 
+### Phase 4: Integration Wiring
+**Goal**: Wire existing tested infrastructure (budget recording, retry decorators, tracing decorators) into production code so that budget enforcement halts on exceeded, all external API calls retry on transient failure, all agent runs emit LangSmith spans with metadata, and version detection persists on HarvestPage objects
+**Depends on**: Phase 3
+**Requirements**: CORE-08, RES-01, OBS-02, HARV-08
+**Gap Closure:** Closes gaps from v1.0 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Running a pipeline with a budget cap of $0.01 causes the conductor to halt after the first real API call because TokenBudget.record_usage() is called with actual response.usage data and budget.exceeded returns True
+  2. Killing a Firecrawl/Exa/Tavily API endpoint (simulated via mock raising transient error) triggers exponential backoff retries visible in logs before the call succeeds or exhausts retries
+  3. Every agent.run() call creates a LangSmith span with phase, agent_name, and iteration metadata tags (visible when LangSmith is configured; no-op when not)
+  4. After harvest, every HarvestPage in HarvestResult.pages has detected_version populated when the content contains a semver string
+**Plans:** 1 plan
+
+Plans:
+- [ ] 04-01-PLAN.md -- Wire budget recording, apply @api_retry, apply @traceable_agent, fix version detection persistence
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/3 | In Progress | - |
-| 2. Research Engine | 0/3 | Not started | - |
-| 3. Output Pipeline | 0/3 | Not started | - |
+| 1. Foundation | 3/3 | Complete | 2026-03-05 |
+| 2. Research Engine | 3/3 | Complete | 2026-03-05 |
+| 3. Output Pipeline | 3/3 | Complete | 2026-03-05 |
+| 4. Integration Wiring | 0/1 | Not started | - |

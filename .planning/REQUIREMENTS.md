@@ -14,7 +14,7 @@
 - [x] **CORE-05**: Pipeline state persists to JSON at every phase boundary in `.skill-builder/state/{tool_name}.json`
 - [x] **CORE-06**: Pipeline can resume from any checkpoint after failure
 - [x] **CORE-07**: Dry-run mode prints fetch plan and estimated API cost, then exits
-- [x] **CORE-08**: Global token budget cap prevents runaway costs in feedback loops
+- [ ] **CORE-08**: Global token budget cap prevents runaway costs in feedback loops
 - [x] **CORE-09**: CLI entry point via Click accepts brief file path and options (dry-run, resume, verbose)
 - [x] **CORE-10**: Rich CLI progress output shows current phase, agent activity, and completion status
 
@@ -27,7 +27,7 @@
 - [x] **HARV-05**: Exa semantic search finds examples and best practices for the target tool
 - [x] **HARV-06**: Tavily web search finds common errors and Claude Code integration patterns
 - [x] **HARV-07**: Content is deduplicated by URL and content hash before synthesis
-- [x] **HARV-08**: Version numbers are detected across sources and conflicts are flagged
+- [ ] **HARV-08**: Version numbers are detected across sources and conflicts are flagged
 - [x] **HARV-09**: Saturation check: LLM assesses whether critical information is still missing after each harvest round
 - [x] **HARV-10**: Harvest phase runs URL extraction and supplemental searches in parallel
 
@@ -60,7 +60,7 @@
 ### Observability
 
 - [x] **OBS-01**: All Anthropic API calls are wrapped with LangSmith `@traceable` decorator
-- [x] **OBS-02**: Each agent run includes metadata tags for phase, agent name, and iteration number
+- [ ] **OBS-02**: Each agent run includes metadata tags for phase, agent name, and iteration number
 - [x] **OBS-03**: Cost and token tracking is fully offloaded to LangSmith (no local tracking)
 
 ### Packaging
@@ -71,7 +71,7 @@
 
 ### Resilience
 
-- [x] **RES-01**: Exponential backoff on all external API calls (Anthropic, Exa, Tavily, Firecrawl)
+- [ ] **RES-01**: Exponential backoff on all external API calls (Anthropic, Exa, Tavily, Firecrawl)
 - [x] **RES-02**: LangSmith tracing errors never block the pipeline (wrapped at integration boundary)
 - [x] **RES-03**: Feedback loops have hard iteration caps (max 2 for gap analysis, max 2 for validation)
 
@@ -110,7 +110,7 @@
 | CORE-05 | Phase 1 | Complete |
 | CORE-06 | Phase 1 | Complete |
 | CORE-07 | Phase 1 | Complete |
-| CORE-08 | Phase 1 | Complete |
+| CORE-08 | Phase 4 | Pending |
 | CORE-09 | Phase 1 | Complete |
 | CORE-10 | Phase 3 | Complete |
 | HARV-01 | Phase 2 | Complete |
@@ -120,7 +120,7 @@
 | HARV-05 | Phase 2 | Complete |
 | HARV-06 | Phase 2 | Complete |
 | HARV-07 | Phase 2 | Complete |
-| HARV-08 | Phase 2 | Complete |
+| HARV-08 | Phase 4 | Pending |
 | HARV-09 | Phase 2 | Complete |
 | HARV-10 | Phase 2 | Complete |
 | SYNTH-01 | Phase 2 | Complete |
@@ -141,12 +141,12 @@
 | VAL-05 | Phase 3 | Complete |
 | VAL-06 | Phase 3 | Complete |
 | OBS-01 | Phase 1 | Complete |
-| OBS-02 | Phase 1 | Complete |
+| OBS-02 | Phase 4 | Pending |
 | OBS-03 | Phase 1 | Complete |
 | PKG-01 | Phase 3 | Complete |
 | PKG-02 | Phase 3 | Complete |
 | PKG-03 | Phase 3 | Complete |
-| RES-01 | Phase 1 | Complete |
+| RES-01 | Phase 4 | Pending |
 | RES-02 | Phase 1 | Complete |
 | RES-03 | Phase 1 | Complete |
 
