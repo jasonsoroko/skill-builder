@@ -33,12 +33,12 @@
 
 ### Agent Synthesis
 
-- [ ] **SYNTH-01**: Organizer agent (Sonnet) structures raw research into categories: installation, core concepts, use cases, API surface, config, common errors, anti-patterns, integration patterns, dependencies
-- [ ] **SYNTH-02**: Gap Analyzer agent (Opus with adaptive thinking) cross-references organized research against the skill brief's `required_capabilities`, `target_use_case`, `tool_category`, and `target_api_version`
-- [ ] **SYNTH-03**: Gap Analyzer produces a GapReport with `is_sufficient`, `identified_gaps`, and `recommended_search_queries`
-- [ ] **SYNTH-04**: If any item from `required_capabilities` is missing, Gap Analyzer fails the sufficiency check
-- [ ] **SYNTH-05**: Learner agent (Sonnet) extracts a structured KnowledgeModel: canonical use cases, required parameters, common gotchas, best practices, anti-patterns, dependencies, minimum viable example, trigger phrases
-- [ ] **SYNTH-06**: All agent outputs are enforced via Anthropic tool_use with Pydantic model schemas
+- [x] **SYNTH-01**: Organizer agent (Sonnet) structures raw research into categories: installation, core concepts, use cases, API surface, config, common errors, anti-patterns, integration patterns, dependencies
+- [x] **SYNTH-02**: Gap Analyzer agent (Opus with adaptive thinking) cross-references organized research against the skill brief's `required_capabilities`, `target_use_case`, `tool_category`, and `target_api_version`
+- [x] **SYNTH-03**: Gap Analyzer produces a GapReport with `is_sufficient`, `identified_gaps`, and `recommended_search_queries`
+- [x] **SYNTH-04**: If any item from `required_capabilities` is missing, Gap Analyzer fails the sufficiency check
+- [x] **SYNTH-05**: Learner agent (Sonnet) extracts a structured KnowledgeModel: canonical use cases, required parameters, common gotchas, best practices, anti-patterns, dependencies, minimum viable example, trigger phrases
+- [x] **SYNTH-06**: All agent outputs are enforced via Anthropic tool_use with Pydantic model schemas
 
 ### Production
 
@@ -123,12 +123,12 @@
 | HARV-08 | Phase 2 | Complete |
 | HARV-09 | Phase 2 | Complete |
 | HARV-10 | Phase 2 | Complete |
-| SYNTH-01 | Phase 2 | Pending |
-| SYNTH-02 | Phase 2 | Pending |
-| SYNTH-03 | Phase 2 | Pending |
-| SYNTH-04 | Phase 2 | Pending |
-| SYNTH-05 | Phase 2 | Pending |
-| SYNTH-06 | Phase 2 | Pending |
+| SYNTH-01 | Phase 2 | Complete |
+| SYNTH-02 | Phase 2 | Complete |
+| SYNTH-03 | Phase 2 | Complete |
+| SYNTH-04 | Phase 2 | Complete |
+| SYNTH-05 | Phase 2 | Complete |
+| SYNTH-06 | Phase 2 | Complete |
 | PROD-01 | Phase 3 | Pending |
 | PROD-02 | Phase 3 | Pending |
 | PROD-03 | Phase 3 | Pending |
