@@ -15,6 +15,10 @@ class SkillDraft(BaseModel):
     content: str = Field(description="Full SKILL.md content")
     line_count: int = Field(description="Number of lines in the draft")
     has_frontmatter: bool = Field(description="Whether YAML frontmatter is present")
+    reference_files: dict[str, str] | None = Field(
+        default=None,
+        description="Reference files to extract (filename -> content)",
+    )
 
 
 class SetupDraft(BaseModel):
