@@ -1,0 +1,36 @@
+{
+  "dimensions": [
+    {
+      "name": "compactness",
+      "score": 10,
+      "feedback": "390 lines",
+      "passed": true
+    },
+    {
+      "name": "syntax",
+      "score": 10,
+      "feedback": "All 12 Python blocks valid",
+      "passed": true
+    },
+    {
+      "name": "api_accuracy",
+      "score": 8,
+      "feedback": "The skill content is largely accurate and well-aligned with the research data. Here are the specific findings:\n\n**Correct:**\n- Package installation (`pip install exa-py`) and import (`from exa_py import Exa`) are correct.\n- `EXA_API_KEY` environment variable and dashboard URL are correct.\n- Search types (auto, neural, keyword, fast, instant, deep, deep-reasoning) all match the API reference.\n- Categories (company, research paper, news, tweet, personal site, financial report, people) match.\n- `contents` parameter structure with `highlights`, `text`, and `summary` is correct.\n- `highlights` sub-options (`max_characters`, `num_sentences`, `highlights_per_url`, `query`) are correct.\n- `find_similar` method with `exclude_domains` is confirmed via LangChain's ExaFindSimilarResults.\n- `include_domains`/`exclude_domains` max 1200 entries is correct.\n- `num_results` default 10, max 100 is correct.\n- `livecrawl` values (`always`, `fallback`, `never`) are correct.\n- Error codes (401, 402, 429) and their meanings are correct.\n- `INVALID_NUM_RESULTS` when numResults > 100 with highlights is confirmed.\n- `INVALID_REQUEST` for mixing livecrawl and maxAgeHours is confirmed.\n- `output_schema` for deep/deep-reasoning with max depth 2 and max 10 properties is correct.\n- Don't include citation/confidence in outputSchema - confirmed.\n- `additionalQueries` only works with deep types - confirmed.\n- Token efficiency claim (~10x) for highlights vs full text is confirmed.\n- `maxAgeHours` values (0=always crawl, -1=cache only, 24=prefer cache) are correct.\n\n**Minor Issues:**\n1. The `keyword` search type is listed in the API reference but the skill's search types table describes `auto` as 'picks neural vs keyword automatically' - this is slightly simplified but essentially correct per research ('intelligently combines neural and other methods').\n2. The skill says `contents.summary` type is `bool` in the quick reference, which is correct for simple usage (`summary=True`), but the research also mentions structured summaries with JSON schemas - this omission is minor.\n3. The `highlights` object in the research mentions `maxCharacters` (camelCase in API) but the Python SDK uses `max_characters` (snake_case) - the skill correctly uses Python SDK conventions throughout.\n4. The skill accesses `result.output` for deep search output, which aligns with the research mentioning `output.content` and `output.grounding` fields - but the skill uses `result.output` rather than `result.output.content`. This could be slightly inaccurate; the research says the output has sub-fields `content` and `grounding`.\n5. The `start_published_date` format shown uses ISO 8601 with timezone, which matches the API reference.\n6. The `max_age_hours` parameter name uses snake_case (Python SDK convention) vs `maxAgeHours` (API) - this is correct for Python SDK usage.\n\nOverall, the API surface is accurately represented with only minor ambiguities around the deep search output structure.",
+      "passed": true
+    },
+    {
+      "name": "completeness",
+      "score": 8,
+      "feedback": "All 10 canonical use cases have worked examples: (1) Semantic search for LLM pipelines, (2) Research paper category search, (3) URL similarity search, (4) AI agent with grounded web info, (5) Category-specific search (news/tweets/companies), (6) Deep research with structured JSON, (7) RAG workflow with highlights vs full text, (8) Domain/date filtering, (9) Real-time low-latency/autocomplete search, (10) Code context retrieval. The minimum viable example is present and matches the knowledge model. Error handling with retry (including 429 backoff, 401, 402) is covered. DO/DON'T sections cover all anti-patterns and best practices from the knowledge model.\n\nGaps found:\n- **JavaScript SDK** (`npm install exa-js`): Listed as a dependency but has no installation instruction or example in the skill content. The content is entirely Python-focused.\n- **LangChain integration** (`pip install langchain-exa`): Listed as a dependency but has no installation instruction or example.\n- **Optional OpenAI SDK dependency**: Mentioned in the knowledge model but not addressed at all.\n- The gotcha about 'Content filtering options require livecrawl=always' is not explicitly called out in the skill content.\n- The best practice 'Compare performance within latency classes' is not mentioned.\n\nThe missing JavaScript SDK and LangChain integration installation instructions are notable gaps since these are explicitly listed dependencies. However, all canonical use cases are thoroughly covered with working Python examples, and the core dependency (exa-py) has clear installation instructions.",
+      "passed": true
+    },
+    {
+      "name": "trigger_quality",
+      "score": 9,
+      "feedback": "The trigger description is excellent. It is written in third-person imperative style ('Use this skill when...'), is specific about when to activate, and comprehensively covers virtually all trigger phrases from the knowledge model (semantic search, neural search, web search, Exa search, find information about, look up, research using Exa, find similar content/pages, search for recent news, find research papers, search with AI, web search for, find companies, find people, get current information, look up latest, find relevant articles, search and retrieve, find academic papers). It includes strong when-to-use guidance by enumerating specific use cases: semantic/neural search for LLM pipelines, RAG workflows, category-filtered search, deep research with structured JSON output, URL similarity search, real-time low-latency search, and code context retrieval. It also mentions setup requirements (pip install exa-py, EXA_API_KEY). The description is pushy enough to trigger on a wide range of search-related queries. The only minor improvement would be slightly more explicit guidance on when NOT to use it (e.g., 'not for simple Google searches without API needs'), but this is a minor point. Overall, this is a high-quality trigger description.",
+      "passed": true
+    }
+  ],
+  "overall_pass": true,
+  "iteration": 1
+}

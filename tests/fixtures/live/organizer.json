@@ -1,0 +1,353 @@
+{
+  "categories": [
+    {
+      "name": "Exa API Overview & Getting Started",
+      "content": [
+        {
+          "text": "Exa is a search engine built specifically for AI applications. It is used by thousands of companies to power their LLM and agentic applications. Traditional search engines are optimized for clicks and ads, while Exa is optimized to return the highest quality information for LLM applications.",
+          "source_url": "https://exa.ai/docs/reference/faqs"
+        },
+        {
+          "text": "Install the Python SDK: pip install exa-py. Install the JavaScript SDK: npm install exa-js. Get your API key from the Exa Dashboard at dashboard.exa.ai/api-keys.",
+          "source_url": "https://docs.exa.ai/"
+        },
+        {
+          "text": "Basic Python usage: from exa_py import Exa; exa = Exa(api_key='your-api-key'); result = exa.search('blog post about artificial intelligence', type='auto', contents={'highlights': {'max_characters': 4000}})",
+          "source_url": "https://docs.exa.ai/"
+        },
+        {
+          "text": "Basic JavaScript usage: import Exa from 'exa-js'; const exa = new Exa('your-api-key'); const result = await exa.search('blog post about artificial intelligence', { type: 'auto', contents: { highlights: { maxCharacters: 4000 } } });",
+          "source_url": "https://docs.exa.ai/"
+        },
+        {
+          "text": "Basic cURL call: curl --request POST --url https://api.exa.ai/search --header 'accept: application/json' --header 'content-type: application/json' --header 'x-api-key: your-api-key' --data '{\"query\": \"blog post about artificial intelligence\", \"type\": \"auto\", \"contents\": {\"highlights\": {\"maxCharacters\": 4000}}}'",
+          "source_url": "https://docs.exa.ai/"
+        },
+        {
+          "text": "Exa positions itself as 'a search engine made for AIs' and excels at retrieving high-quality, relevant web content to enhance AI applications. Key advantages: Verification Capabilities (AI agent integration), Focused Results (often 20x more correct results for complex queries), Comprehensive Web Coverage, Semantic Understanding (neural search), and Designed for AI Integration.",
+          "source_url": "https://sidbharath.com/blog/the-ultimate-guide-to-building-ai-agents-with-exa/"
+        },
+        {
+          "text": "How to get started: Create an Account at dashboard.exa.ai, Obtain an API Key from dashboard.exa.ai/api-keys, Install the SDK (Python or JavaScript), Set Up Environment Variables with your API key.",
+          "source_url": "https://sidbharath.com/blog/the-ultimate-guide-to-building-ai-agents-with-exa/"
+        }
+      ]
+    },
+    {
+      "name": "How Exa Search Works (Neural Search & Architecture)",
+      "content": [
+        {
+          "text": "At its core, Exa uses embeddings to transform web content into numerical vector representations. This allows it to understand the conceptual meaning of content rather than just matching keywords. Exa's link prediction model is trained to predict which links follow a given piece of text, learning relationships between documents similar to how transformers predict words.",
+          "source_url": "https://sidbharath.com/blog/the-ultimate-guide-to-building-ai-agents-with-exa/"
+        },
+        {
+          "text": "Exa's three main components: (1) Crawling & Indexing - processes documents using AI models to understand content semantically; (2) AI Processing (Neural Search) - uses a neural-based approach instead of traditional PageRank; (3) Search & Retrieval - processes queries like LLM prompts, predicting the most relevant documents rather than exact keyword matches.",
+          "source_url": "https://sidbharath.com/blog/the-ultimate-guide-to-building-ai-agents-with-exa/"
+        },
+        {
+          "text": "Exa offers three main search types: Auto Search (Exa decides neural or keyword based on query), Keyword Search (exact word matches, good for proper nouns), Neural Search (embeddings-based semantic understanding, effective for exploratory searches and complex concepts).",
+          "source_url": "https://sidbharath.com/blog/the-ultimate-guide-to-building-ai-agents-with-exa/"
+        },
+        {
+          "text": "Exa uses embeddings-based next-link prediction. Instead of relying on traditional PageRank (which ranks results based on backlinks and domain authority), Exa uses a neural-based approach. Example: If an article says 'Check out this aerospace startup' and links to spacex.com, Exa learns that 'aerospace startup' is semantically related to SpaceX\u2014even if the text doesn't explicitly say 'SpaceX.'",
+          "source_url": "https://aiinovationhub.com/exa-search-api-for-ai-agents-aiinnovationhub/"
+        },
+        {
+          "text": "Exa's index is maintained with special attention to categories particularly valuable for AI applications: research papers, personal websites, and LinkedIn profiles have very high availability. The index is updated every hour, constantly adding batches of new links.",
+          "source_url": "https://exa.ai/docs/reference/faqs"
+        }
+      ]
+    },
+    {
+      "name": "Search API Reference & Parameters",
+      "content": [
+        {
+          "text": "POST /search endpoint. Required: query (string). Optional parameters include: type (neural, fast, auto, deep, deep-reasoning, instant), category (company, research paper, news, tweet, personal site, financial report, people), numResults (default 10, max 100), includeDomains (array, max 1200), excludeDomains (array, max 1200), startCrawlDate, endCrawlDate, startPublishedDate, endPublishedDate, includeText, excludeText, moderation (boolean), contents (object), userLocation.",
+          "source_url": "https://exa.ai/docs/reference/search"
+        },
+        {
+          "text": "Search types: neural (embeddings-based model), fast (streamlined versions of search models), auto (default, intelligently combines neural and other methods), deep (light deep search), deep-reasoning (base deep search), instant (lowest latency, optimized for real-time applications).",
+          "source_url": "https://exa.ai/docs/reference/search"
+        },
+        {
+          "text": "Category parameter focuses on specific content types: company, research paper, news, tweet, personal site, financial report, people. The people and company categories have improved quality for finding LinkedIn profiles and company pages. Note: company and people categories only support a limited set of filters.",
+          "source_url": "https://exa.ai/docs/reference/search"
+        },
+        {
+          "text": "Response fields: requestId, results (array with title, url, publishedDate, author, id, image, favicon, text, highlights, highlightScores, summary, subpages, extras), searchType, context (deprecated), output (for deep search), costDollars.",
+          "source_url": "https://exa.ai/docs/reference/search"
+        },
+        {
+          "text": "Cost breakdown per request: neuralSearch_1_10_results: $0.007, neuralSearch_additional_result: $0.001, deepSearch: $0.012, deepReasoningSearch: $0.015. Per page prices: contentText: $0.001, contentHighlight: $0.001, contentSummary: $0.001.",
+          "source_url": "https://exa.ai/docs/reference/search"
+        },
+        {
+          "text": "additionalQueries parameter: Additional query variations for deep search. Only works with type='deep' or type='deep-reasoning'. When provided, these queries are used alongside the main query for comprehensive results.",
+          "source_url": "https://exa.ai/docs/reference/search"
+        },
+        {
+          "text": "outputSchema parameter: JSON schema for deep search structured output mode. When provided, the output.content field is returned as structured JSON matching this schema.",
+          "source_url": "https://exa.ai/docs/reference/search"
+        }
+      ]
+    },
+    {
+      "name": "Search Best Practices",
+      "content": [
+        {
+          "text": "Key Benefits: Token efficient - use highlights to get key excerpts relevant to your query, reducing token usage by 10x compared to full text. Specialized index coverage for people, company, and code. Incredible speed: auto (highest quality), fast (sub-second latency), instant (sub-200ms latency).",
+          "source_url": "https://exa.ai/docs/reference/search-best-practices"
+        },
+        {
+          "text": "Search types guide: auto (default, highest quality, combines neural and other methods), fast (low latency, good middle ground), instant (lowest latency for real-time like autocomplete), deep (deep web research with structured outputs, best for multi-step queries requiring reasoning and structured JSON outputs).",
+          "source_url": "https://exa.ai/docs/reference/search-best-practices"
+        },
+        {
+          "text": "Token Efficiency modes: text (deep analysis, full context), highlights (factual questions, specific lookups, multi-step agent workflows), summary (quick overviews, structured extraction). Use highlights for agentic workflows - provides most relevant excerpts without flooding context windows.",
+          "source_url": "https://exa.ai/docs/reference/search-best-practices"
+        },
+        {
+          "text": "Content Freshness via maxAgeHours: maxAgeHours:24 (use cache if <24h old, otherwise livecrawl), maxAgeHours:1 (near real-time), maxAgeHours:0 (always livecrawl), maxAgeHours:-1 (never livecrawl, cache only). Omit for default behavior (livecrawl as fallback if no cache).",
+          "source_url": "https://exa.ai/docs/reference/search-best-practices"
+        },
+        {
+          "text": "Category Filters: company (company pages, LinkedIn company profiles), people (multi-source data, LinkedIn profiles), research paper (academic papers, arXiv), news (current events), tweet (X/Twitter posts), personal site (blogs, personal pages - Exa's unique strength), financial report (SEC filings, earnings reports).",
+          "source_url": "https://exa.ai/docs/reference/search-best-practices"
+        },
+        {
+          "text": "Deep Output Schema: For deep search variants, pass outputSchema to control output.content format. type:'text' returns plain text (with optional description), type:'object' returns structured JSON. Simpler schemas perform better. Max nesting depth: 2, max total properties: 10.",
+          "source_url": "https://exa.ai/docs/reference/search-best-practices"
+        },
+        {
+          "text": "Do not include citation or confidence fields in outputSchema. Deep search already returns grounding and citations automatically in output.grounding. Including them is redundant, increases tokens/latency, and model-generated citation fields are less reliable than built-in grounding.",
+          "source_url": "https://exa.ai/docs/reference/search-best-practices"
+        }
+      ]
+    },
+    {
+      "name": "Contents Retrieval",
+      "content": [
+        {
+          "text": "When using the Exa API, you can request different types of content for each search result: Text (text=True) returns full text content as markdown, extracting main content while filtering out navigation, pop-ups, etc. Summary (summary=True) provides a concise AI-generated summary. Highlights delivers key excerpts most relevant to your search query.",
+          "source_url": "https://docs.exa.ai/reference/contents-retrieval-with-exa-api"
+        },
+        {
+          "text": "Content Filtering Options (require livecrawl:'always'): Verbosity controls detail level - full (complete content), standard (balanced), compact (default, most concise). Section Filtering - includeSections or excludeSections for: metadata, footer, sidebar, body, banner, navigation, header.",
+          "source_url": "https://docs.exa.ai/reference/contents-retrieval-with-exa-api"
+        },
+        {
+          "text": "Structured Summaries: provide a JSON schema in the summary request to get structured data back. Example schema for company information with name, industry, foundedYear fields. The API returns the summary as a JSON string matching your schema.",
+          "source_url": "https://docs.exa.ai/reference/contents-retrieval-with-exa-api"
+        },
+        {
+          "text": "Highlights configuration: Simple boolean (highlights=True) for default highlights based on search query, or detailed configuration object with query (specific highlight query) and maxCharacters (maximum characters to return).",
+          "source_url": "https://docs.exa.ai/reference/contents-retrieval-with-exa-api"
+        },
+        {
+          "text": "Images and favicons: Get images from webpages by setting imageLinks (under contents.extras.imageLinks) to specify how many images per result. Each result includes the website's favicon URL and a representative image URL when available.",
+          "source_url": "https://docs.exa.ai/reference/contents-retrieval-with-exa-api"
+        },
+        {
+          "text": "Crawl Errors: The contents endpoint provides detailed status via the statuses field. Error tags: CRAWL_NOT_FOUND (HTTP 404), CRAWL_TIMEOUT (HTTP 408), CRAWL_LIVECRAWL_TIMEOUT (livecrawlTimeout limit reached), SOURCE_NOT_AVAILABLE (HTTP 403), CRAWL_UNKNOWN_ERROR (HTTP 500+).",
+          "source_url": "https://docs.exa.ai/reference/contents-retrieval-with-exa-api"
+        }
+      ]
+    },
+    {
+      "name": "Deep Search & Structured Outputs (March 2026 Revamp)",
+      "content": [
+        {
+          "text": "Exa Deep Revamp (March 4, 2026): Greatly improved performance for Deep workloads. Latency ranges: deep (4-12 seconds), deep-reasoning (12-50 seconds). New search type deep-reasoning for higher-effort reasoning tasks. 20% lower price for regular deep search. New: structured outputs for Deep using output schemas.",
+          "source_url": "https://exa.ai/docs/changelog/exa-deep-revamp"
+        },
+        {
+          "text": "New request schema controls: type, description, and properties on outputSchema (output_schema in Python SDK). New synthesized response fields: output.content and output.grounding. Pricing: deep at $12 per 1,000 requests, deep-reasoning additional $3 per 1,000 requests (total $15 per 1,000 requests).",
+          "source_url": "https://exa.ai/docs/changelog/exa-deep-revamp"
+        },
+        {
+          "text": "Deep Output Response Shape: output.content for synthesized text or structured JSON, output.grounding for field-level citations and confidence. Example grounding entry includes field path, citations array (url and title), and confidence level (high/low).",
+          "source_url": "https://exa.ai/docs/changelog/exa-deep-revamp"
+        },
+        {
+          "text": "Example structured output request: {\"query\": \"top aerospace companies\", \"type\": \"deep-reasoning\", \"outputSchema\": {\"type\": \"object\", \"properties\": {\"companies\": {\"type\": \"array\"}}}}",
+          "source_url": "https://exa.ai/docs/changelog/exa-deep-revamp"
+        }
+      ]
+    },
+    {
+      "name": "Error Codes & Troubleshooting",
+      "content": [
+        {
+          "text": "Exa API Error Codes: 400 Bad Request (invalid parameters, malformed JSON), 401 Unauthorized (missing/invalid API key), 402 Payment Required (credits exhausted or budget exceeded), 403 Forbidden (insufficient permissions or content blocked), 404 Not Found (resource doesn't exist), 409 Conflict (resource already exists), 422 Unprocessable Entity (well-formed but unprocessable), 429 Too Many Requests (rate limit exceeded), 500 Internal Server Error, 501 Not Implemented, 502 Bad Gateway, 503 Service Unavailable.",
+          "source_url": "https://exa.ai/docs/reference/error-codes"
+        },
+        {
+          "text": "Authentication & Authorization error tags: INVALID_API_KEY (401), NO_MORE_CREDITS (402), API_KEY_BUDGET_EXCEEDED (402), ACCESS_DENIED (403, /search only), FEATURE_DISABLED (403), ROBOTS_FILTER_FAILED (403, /contents only), PROHIBITED_CONTENT (403, /answer and /research), CONTENT_FILTER_ERROR (403, /search only).",
+          "source_url": "https://exa.ai/docs/reference/error-codes"
+        },
+        {
+          "text": "Request Validation error tags: INVALID_REQUEST_BODY (400), INVALID_REQUEST (400, conflicting parameters like livecrawl and maxAgeHours), INVALID_URLS (400), INVALID_NUM_RESULTS (400, numResults must be \u2264100 when using highlights), INVALID_FLAGS (400), INVALID_JSON_SCHEMA (400), NUM_RESULTS_EXCEEDED (400), NO_CONTENT_FOUND (400).",
+          "source_url": "https://exa.ai/docs/reference/error-codes"
+        },
+        {
+          "text": "Processing error tags: FETCH_DOCUMENT_ERROR (422), UNABLE_TO_GENERATE_RESPONSE (501, /answer and /research only), DEFAULT_ERROR (500), INTERNAL_ERROR (500).",
+          "source_url": "https://exa.ai/docs/reference/error-codes"
+        },
+        {
+          "text": "Common errors from community skills: Authentication Failed - 'Authentication error: Invalid API key' - Cause: API key missing, expired, or invalid. Solution: verify EXA_API_KEY env var. Rate Limit Exceeded - 'Rate limit exceeded. Please retry after X seconds.' - Solution: implement exponential backoff. Network Timeout - 'Request timeout after 30000ms' - Solution: increase timeout, e.g., new Client({ timeout: 60000 }).",
+          "source_url": "https://lobehub.com/skills/nivkazdan-skills-agents-catalog-exa-common-errors"
+        },
+        {
+          "text": "Quick Diagnostic Commands: curl -s https://status.exa.com (check Exa status), curl -I https://api.exa.com (verify API connectivity), env | grep EXA (check local configuration). Escalation path: use exa-debug-bundle, check status page, contact support with request ID.",
+          "source_url": "https://lobehub.com/skills/jeremylongshore-claude-code-plugins-plus-skills-exa-common-errors"
+        }
+      ]
+    },
+    {
+      "name": "Integrations (LangChain, MCP, Google Apps Script, etc.)",
+      "content": [
+        {
+          "text": "LangChain integration: install langchain-exa (pip install -qU langchain-exa). Tools available: ExaSearchResults (performs Exa searches with structured interface), ExaFindSimilarResults (finds webpages similar to a given URL), ExaSearchRetriever (retriever for relevant documents). Advanced options: num_results, type ('neural', 'keyword', 'auto'), livecrawl ('always', 'fallback', 'never'), text_contents_options, summary.",
+          "source_url": "https://docs.langchain.com/oss/python/integrations/tools/exa_search"
+        },
+        {
+          "text": "LangChain ExaSearchResults example: search_tool = ExaSearchResults(exa_api_key=os.environ['EXA_API_KEY']); search_results = search_tool._run(query='...', num_results=5, text_contents_options=True, highlights=True)",
+          "source_url": "https://docs.langchain.com/oss/python/integrations/tools/exa_search"
+        },
+        {
+          "text": "ExaFindSimilarResults: find_similar_tool = ExaFindSimilarResults(exa_api_key=...); similar_results = find_similar_tool._run(url='http://espn.com', num_results=5, text_contents_options=True, highlights=True). Useful for finding related content or competitive analysis.",
+          "source_url": "https://docs.langchain.com/oss/python/integrations/tools/exa_search"
+        },
+        {
+          "text": "Google Apps Script integration: Exa client library for Google Apps Script supporting all search types and filters. Set EXA_API_KEY in Script properties. searchAndContents() is the primary method. Options include type ('neural', 'keyword', 'auto'), category, numResults, startPublishedDate, endPublishedDate, includeDomains, excludeDomains, text, highlights, summary, livecrawl.",
+          "source_url": "https://kamilstanuch.medium.com/how-to-integrate-exa-ai-semantic-search-into-google-apps-script-tutorial-e46d1406936b"
+        },
+        {
+          "text": "MCP (Model Context Protocol) support: Exa MCP server enables direct integration with AI assistants like Claude, Cursor, and other MCP-compatible clients. Provides tools for web search, code context retrieval, company research, and deep research capabilities without direct API calls.",
+          "source_url": "https://skywork.ai/skypage/en/unlocking-ai-agents-exa-search-mcp-server/1978661417322663936"
+        },
+        {
+          "text": "Context API (Exa Code): Searches over billions of GitHub repos, docs pages, Stack Overflow posts to find token-efficient code context. Endpoint: POST https://api.exa.ai/context. Parameters: query (required, max 2000 chars), tokensNum (optional, 50-100000 or 'dynamic'). Returns formatted code snippets and contextual examples.",
+          "source_url": "https://docs.exa.ai/reference/context"
+        }
+      ]
+    },
+    {
+      "name": "Websets API",
+      "content": [
+        {
+          "text": "Websets feature: web research agent to find people, companies, research papers, and more. Create a Search for a Webset via POST /v0/websets/{webset}/searches. Default behavior is to reuse previous Search results and evaluate them against new criteria.",
+          "source_url": "https://docs.exa.ai/websets/api/websets/searches/create-a-search"
+        },
+        {
+          "text": "CreateWebsetSearchParameters: count (required, minimum 1), query (required, 1-5000 chars, natural language describing what you're looking for), entity (optional, auto-detected), criteria (optional array of up to 5 criteria), exclude (sources to exclude), scope (limit to specific sources), recall (boolean, estimate of total relevant results), behavior ('override' or 'append', default 'override'), metadata.",
+          "source_url": "https://docs.exa.ai/websets/api/websets/searches/create-a-search"
+        },
+        {
+          "text": "Criteria vs Enrichments: Criteria are binary filters (result meets it or doesn't), included in base search cost. Enrichments are data extractors that pull additional information from results that passed criteria, cost additional credits per result. Example criteria: 'Has experience with React', 'Located in San Francisco'. Example enrichments: 'LinkedIn profile URL', 'Email address'.",
+          "source_url": "https://exa.ai/docs/websets/dashboard/criteria-versus-enrichments"
+        },
+        {
+          "text": "JavaScript Websets example: const search = await exa.websets.searches.create('webset_id', { query: 'additional companies to add', count: 5 }); Python: search = exa.websets.searches.create('webset_id', params={'query': 'additional companies to add', 'count': 5})",
+          "source_url": "https://docs.exa.ai/websets/api/websets/searches/create-a-search"
+        }
+      ]
+    },
+    {
+      "name": "Evaluation Methodology & Benchmarks",
+      "content": [
+        {
+          "text": "Exa's evaluation approach: Pure Result Grading (LLM graders score relevance/quality of results for different query sets from 0-1), RAG Grading (evaluate search quality by how much it enhances LLM question-answering using SimpleQA), Open Evaluations (list of queries run over any index, graded by LLM - avoids false negative problems of closed evals).",
+          "source_url": "https://exa.ai/blog/evals-at-exa"
+        },
+        {
+          "text": "Evaluation datasets: SimpleQA (factual QA, Fast/Auto search), FRAMES (single-step and agentic slices), MultiLoKo & BrowseComp (multi-hop reasoning, Deep search), Seal0 (general search quality), HLE (hard, long, emerging questions, Deep search), FreshQA (time-sensitive queries, with livecrawl).",
+          "source_url": "https://exa.ai/docs/reference/evaluating-exa-search"
+        },
+        {
+          "text": "Benchmark results examples: Exa Fast achieves 94.2% accuracy on SimpleQA at 450ms. Exa Auto: 95.8% at 1050ms. Exa Deep: 97.2% at 4950ms. Exa Deep leads on FRAMES (96%) and MultiLoKo (89%). Always compare within latency classes (Fast <500ms vs Fast competitors, not Fast vs Deep).",
+          "source_url": "https://exa.ai/docs/reference/evaluating-exa-search"
+        },
+        {
+          "text": "Grading methodology: Pointwise grading (numerical 0-1 score per query-document pair), Pairwise (compare result sets, select best, compute ELO), Listwise (randomly interleave results, ask LLM to reorder). Exa uses GPT-4.1 for grading. Top 5 results per query evaluated for computational efficiency.",
+          "source_url": "https://exa.ai/blog/evals-at-exa"
+        },
+        {
+          "text": "MS Marco critique: closed evals have false negative problem (impossible to label all documents in large corpus), scale matters (embedding model performance decreases faster than sparse models with larger indexes), MS Marco distribution is not representative of real AI use cases (Bing user queries from before 2020).",
+          "source_url": "https://exa.ai/blog/evals-at-exa"
+        }
+      ]
+    },
+    {
+      "name": "Semantic Search Concepts & Filtering",
+      "content": [
+        {
+          "text": "Semantic search retrieves information based on meaning, not surface words. Text is converted to vectors (embeddings) that cluster similar ideas together regardless of phrasing. Similarity metrics like cosine similarity or Euclidean distance determine how close vector points are. Algorithms like HNSW and StreamingDiskANN enable fast retrieval at scale.",
+          "source_url": "https://www.tigerdata.com/blog/what-is-semantic-search-with-filters-and-how-to-implement-it-with-pgvector-and-python"
+        },
+        {
+          "text": "Filtered semantic search combines semantic understanding with attribute-based filtering. Filters restrict the vector space where search happens. Pre-filtering narrows dataset based on metadata then searches within; Post-filtering searches first then applies filters. Qdrant's filterable vector index adds specialized links between filtered data points to maintain search accuracy.",
+          "source_url": "https://dev.to/qdrant/a-complete-guide-to-filtering-in-vector-search-33lk?bb=168576"
+        },
+        {
+          "text": "HNSW vs StreamingDiskANN for filtered searches: HNSW provides fast queries and high recall but is memory-intensive and struggles with filtered searches. StreamingDiskANN stores part of index on disk (cost-efficient), supports streaming filtering for accurate retrieval with secondary filters, better for large datasets requiring complex filtered semantic searches.",
+          "source_url": "https://www.tigerdata.com/blog/what-is-semantic-search-with-filters-and-how-to-implement-it-with-pgvector-and-python"
+        },
+        {
+          "text": "Explainable semantic search techniques: (1) Attention-based interpretability - visualize attention weights from transformers like BERT/T5 to see why matches are prioritized; (2) Knowledge graph integration - ground results in structured entity relationships with traceable KG paths; (3) Hybrid neural-symbolic systems - combine neural embeddings with rule-based filters, separating explanations into semantic similarity scores and applied business rules.",
+          "source_url": "https://milvus.io/ai-quick-reference/what-are-the-emerging-techniques-for-explainable-semantic-search"
+        },
+        {
+          "text": "Keyword search failure modes: Overfitting to phrasing ('terminate agreement' doesn't find 'contract dissolution'), Multilingual mismatch, Synonym blindness ('doctoral candidates' misses 'PhD students'). A 2024 benchmark study showed enterprises lose $31,754 per employee per year due to inefficient internal search systems.",
+          "source_url": "https://medium.com/tellian-io/semantic-search-demystified-architectures-use-cases-and-what-actually-works-40a090b11fbb"
+        }
+      ]
+    },
+    {
+      "name": "Building AI Agents with Exa",
+      "content": [
+        {
+          "text": "Basic research agent example with Python: initialize Exa client and OpenAI client, use exa.search_and_contents(query, num_results, text=True) to gather information, compile content from results, summarize with GPT-4-turbo, return final report with sources.",
+          "source_url": "https://sidbharath.com/blog/the-ultimate-guide-to-building-ai-agents-with-exa/"
+        },
+        {
+          "text": "Agent types possible with Exa: Basic agents (search and retrieve content), Advanced agents (write newsletters or recruit candidates), Chain-of-thought research agents (break down complex questions), Content creation agents (multi-modal outputs).",
+          "source_url": "https://www.linkedin.com/posts/sidbharath_the-ultimate-guide-to-building-ai-agents-activity-7300975301109428224-oTnq"
+        },
+        {
+          "text": "Real-world AI agent applications: AI research assistants with current research, investment due diligence platforms, competitive intelligence gathering, fact-checking pipelines, live content monitoring, similar content discovery. Exa's MCP integration enables seamless use in Claude, Cursor, and other MCP-compatible clients.",
+          "source_url": "https://www.linkedin.com/pulse/exa-search-engine-actually-understands-what-ai-needs-holt-nguyen-fiqjf"
+        },
+        {
+          "text": "Exa differs from LLMs: Exa is a search engine that predicts specific links on the web given their relevance to a query. LLMs are models built to predict the next piece of text. Exa enhances LLMs by supplying high-quality, relevant web content, minimizing hallucination and outdated responses.",
+          "source_url": "https://exa.ai/docs/reference/faqs"
+        },
+        {
+          "text": "exa-search skill (xfstudio/skills): Enables semantic search and similar content discovery using the Exa API. Install: npx playbooks add skill xfstudio/skills --skill exa-search. Best practices: validate semantic matches with snippet previews, batch embeddings, index metadata for filtering, preprocess documents before embedding, store API keys in env variables.",
+          "source_url": "https://playbooks.com/skills/xfstudio/skills/exa-search"
+        }
+      ]
+    },
+    {
+      "name": "Changelog & Recent Updates",
+      "content": [
+        {
+          "text": "Language Filtering (November 5, 2025): Exa now detects query language and only returns web search results in the same language. Turned on by default for all users. No setup needed. Works across all languages.",
+          "source_url": "https://exa.ai/docs/changelog/language-filtering-default"
+        },
+        {
+          "text": "Exa Deep Revamp (March 4, 2026): Improved performance, new deep-reasoning type, structured outputs, 20% lower price for regular deep search. deep: $12/1000 requests, deep-reasoning: $15/1000 requests total.",
+          "source_url": "https://exa.ai/docs/changelog/exa-deep-revamp"
+        },
+        {
+          "text": "Exa roadmap: Super low latency search, Build a (much) larger index, Solve search.",
+          "source_url": "https://exa.ai/docs/reference/faqs"
+        }
+      ]
+    }
+  ],
+  "source_count": 36,
+  "tools_covered": [
+    "exa-search"
+  ]
+}

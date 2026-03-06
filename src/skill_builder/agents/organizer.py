@@ -63,7 +63,7 @@ class OrganizerAgent:
 
         response = self.client.messages.parse(
             model="claude-sonnet-4-6",
-            max_tokens=8192,
+            max_tokens=16384,
             output_format=CategorizedResearch,
             system=_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": prompt}],
