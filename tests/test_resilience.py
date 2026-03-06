@@ -304,7 +304,7 @@ class TestUnifiedRetry:
 
         call_count = 0
 
-        @api_retry_any(max_attempts=3)
+        @api_retry_any(max_attempts=3, initial=0.01, max_wait=0.1)
         def flaky() -> str:
             nonlocal call_count
             call_count += 1
@@ -322,7 +322,7 @@ class TestUnifiedRetry:
 
         call_count = 0
 
-        @api_retry_any(max_attempts=3)
+        @api_retry_any(max_attempts=3, initial=0.01, max_wait=0.1)
         def auth_fail() -> str:
             nonlocal call_count
             call_count += 1
@@ -346,7 +346,7 @@ class TestRetryVisibility:
 
         call_count = 0
 
-        @api_retry_any(max_attempts=3)
+        @api_retry_any(max_attempts=3, initial=0.01, max_wait=0.1)
         def flaky() -> str:
             nonlocal call_count
             call_count += 1

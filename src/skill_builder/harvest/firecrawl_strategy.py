@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 async def _firecrawl_crawl_with_retry(fc, url: str, max_pages: int):
     """Async Firecrawl crawl with exponential backoff retry."""
     async for attempt in AsyncRetrying(
-        wait=wait_exponential_jitter(initial=0.01, max=0.1, jitter=0.01),
+        wait=wait_exponential_jitter(initial=1.0, max=60.0, jitter=1.0),
         stop=stop_after_attempt(5),
         retry=retry_if_exception(_is_retryable_any),
         reraise=True,

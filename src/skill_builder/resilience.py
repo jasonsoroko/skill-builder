@@ -129,12 +129,19 @@ def api_retry(max_attempts: int = 5) -> Any:
     )
 
 
-def api_retry_any(max_attempts: int = 5) -> Any:
+def api_retry_any(
+    max_attempts: int = 5, *, initial: float = 1.0, max_wait: float = 60.0
+) -> Any:
     """Retry decorator for ALL external API calls with exponential backoff + jitter.
 
     Covers all SDKs: Anthropic, Firecrawl, Exa (requests), Tavily, GitHub (httpx).
     Uses _is_retryable_any for classification and _make_retry_callback for
     user-visible retry messages.
+
+    Args:
+        max_attempts: Maximum number of retry attempts.
+        initial: Initial backoff delay in seconds (default 1.0 for production).
+        max_wait: Maximum backoff delay in seconds (default 60.0 for production).
 
     Usage:
         @api_retry_any(max_attempts=5)
@@ -142,7 +149,7 @@ def api_retry_any(max_attempts: int = 5) -> Any:
             ...
     """
     return retry(
-        wait=wait_exponential_jitter(initial=0.01, max=0.1, jitter=0.01),
+        wait=wait_exponential_jitter(initial=initial, max=max_wait, jitter=initial),
         stop=stop_after_attempt(max_attempts),
         retry=retry_if_exception(_is_retryable_any),
         reraise=True,

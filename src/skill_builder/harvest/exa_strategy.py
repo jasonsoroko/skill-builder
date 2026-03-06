@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 
 from exa_py import Exa
 
@@ -47,7 +48,7 @@ async def exa_search(query: str, *, num_results: int = 10) -> list[HarvestPage]:
     """
     logger.info("Exa search: %r (num_results=%d)", query, num_results)
 
-    exa = Exa()  # Reads EXA_API_KEY from env
+    exa = Exa(api_key=os.environ.get("EXA_API_KEY"))
 
     # Wrap sync call (with retry) in asyncio.to_thread for async compatibility
     response = await asyncio.to_thread(_exa_search_sync, exa, query, num_results)
