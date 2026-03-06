@@ -21,6 +21,7 @@ from anthropic import Anthropic
 
 from skill_builder.models.brief import SkillBrief
 from skill_builder.models.synthesis import CategorizedResearch, GapReport
+from skill_builder.resilience import retry_parse
 from skill_builder.tracing import create_traced_client
 
 logger = logging.getLogger(__name__)
@@ -70,7 +71,8 @@ class GapAnalyzerAgent:
             brief.name,
         )
 
-        response = self.client.messages.parse(
+        response = retry_parse(
+            self.client,
             model="claude-opus-4-6",
             max_tokens=16000,
             thinking={"type": "adaptive"},

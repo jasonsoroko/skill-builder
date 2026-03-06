@@ -20,6 +20,7 @@ from anthropic import Anthropic
 from skill_builder.models.brief import SkillBrief
 from skill_builder.models.production import SkillDraft
 from skill_builder.models.synthesis import KnowledgeModel
+from skill_builder.resilience import retry_parse
 from skill_builder.tracing import create_traced_client
 
 logger = logging.getLogger(__name__)
@@ -78,7 +79,8 @@ class MapperAgent:
             len(km.canonical_use_cases),
         )
 
-        response = self.client.messages.parse(
+        response = retry_parse(
+            self.client,
             model="claude-sonnet-4-6",
             max_tokens=8192,
             output_format=SkillDraft,

@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from skill_builder.models.brief import SkillBrief
 from skill_builder.models.synthesis import GeneratedQueries
+from skill_builder.resilience import retry_parse
 
 if TYPE_CHECKING:
     from anthropic import Anthropic
@@ -70,7 +71,8 @@ Generate one Tavily query per required capability
 (factual/current: error messages, version issues, gotchas).
 """
     try:
-        response = client.messages.parse(
+        response = retry_parse(
+            client,
             model="claude-sonnet-4-6",
             max_tokens=2048,
             output_format=GeneratedQueries,
@@ -129,7 +131,8 @@ For each gap query, produce:
 - One Tavily query (factual/current: error messages, version-specific issues, gotchas)
 """
     try:
-        response = client.messages.parse(
+        response = retry_parse(
+            client,
             model="claude-sonnet-4-6",
             max_tokens=2048,
             output_format=GeneratedQueries,

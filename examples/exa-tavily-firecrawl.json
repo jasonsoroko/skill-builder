@@ -33,5 +33,6 @@
     "result deduplication"
   ],
   "deploy_target": "user",
-  "target_api_version": null
+  "target_api_version": null,
+  "max_pages": 15
 }

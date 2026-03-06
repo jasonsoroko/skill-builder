@@ -16,6 +16,7 @@ import logging
 from anthropic import Anthropic
 
 from skill_builder.models.evaluation import EvaluationDimension
+from skill_builder.resilience import retry_parse
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +59,8 @@ async def evaluate_trigger_quality(
     )
 
     response = await asyncio.to_thread(
-        client.messages.parse,
+        retry_parse,
+        client,
         model="claude-opus-4-6",
         max_tokens=4096,
         output_format=EvaluationDimension,

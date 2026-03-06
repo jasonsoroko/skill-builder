@@ -17,6 +17,7 @@ from anthropic import Anthropic
 from skill_builder.models.brief import SkillBrief
 from skill_builder.models.harvest import HarvestResult
 from skill_builder.models.synthesis import CategorizedResearch
+from skill_builder.resilience import retry_parse
 from skill_builder.tracing import create_traced_client
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,8 @@ class OrganizerAgent:
             brief.name,
         )
 
-        response = self.client.messages.parse(
+        response = retry_parse(
+            self.client,
             model="claude-sonnet-4-6",
             max_tokens=16384,
             output_format=CategorizedResearch,
@@ -82,8 +84,16 @@ class OrganizerAgent:
         )
         return result
 
+    # Budget ~150K tokens for content = ~600K chars.
+    # Reserve ~2K chars for brief context and overhead.
+    _MAX_PROMPT_CHARS = 600_000
+
     def _build_prompt(self, harvest: HarvestResult, brief: SkillBrief) -> str:
-        """Build the user prompt with brief context and harvested content."""
+        """Build the user prompt with brief context and harvested content.
+
+        Truncates per-page content proportionally so the total prompt fits
+        within the model's context window.
+        """
         parts: list[str] = []
 
         # Brief context
@@ -101,12 +111,27 @@ class OrganizerAgent:
             for warning in harvest.warnings:
                 parts.append(f"- {warning}")
 
+        # Calculate per-page budget to stay within context window.
+        # When page count is extreme (>2990), overhead alone exceeds the budget;
+        # the max(500, ...) floor still applies but total may exceed the cap,
+        # so we hard-truncate the final prompt as a backstop.
+        n_pages = len(harvest.pages)
+        overhead = 200 * n_pages  # url + title headers per page
+        content_budget = self._MAX_PROMPT_CHARS - 2000 - overhead
+        per_page_limit = max(500, content_budget // max(n_pages, 1))
+
         # Page content
-        parts.append(f"\n--- Harvested Content ({len(harvest.pages)} pages) ---\n")
+        parts.append(f"\n--- Harvested Content ({n_pages} pages) ---\n")
         for page in harvest.pages:
             parts.append(f"## Source: {page.url}")
             parts.append(f"Title: {page.title}")
-            parts.append(page.content)
+            content = page.content
+            if len(content) > per_page_limit:
+                content = content[:per_page_limit] + "\n[... truncated ...]"
+            parts.append(content)
             parts.append("")  # blank line separator
 
-        return "\n".join(parts)
+        prompt = "\n".join(parts)
+        if len(prompt) > self._MAX_PROMPT_CHARS:
+            prompt = prompt[: self._MAX_PROMPT_CHARS] + "\n[... prompt truncated ...]"
+        return prompt

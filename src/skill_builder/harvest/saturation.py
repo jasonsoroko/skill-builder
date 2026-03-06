@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from skill_builder.models.harvest import HarvestPage
 from skill_builder.models.synthesis import SaturationResult
+from skill_builder.resilience import retry_parse
 
 if TYPE_CHECKING:
     from anthropic import Anthropic
@@ -75,7 +76,8 @@ List any capabilities with zero representation in the harvested content.
 If all capabilities have at least some coverage, set is_saturated=true."""
 
     try:
-        response = client.messages.parse(
+        response = retry_parse(
+            client,
             model="claude-sonnet-4-6",
             max_tokens=1024,
             output_format=SaturationResult,

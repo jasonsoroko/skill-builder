@@ -155,3 +155,14 @@ def api_retry_any(
         reraise=True,
         before_sleep=_make_retry_callback(),
     )
+
+
+_parse_retry = api_retry_any()
+
+
+def retry_parse(client: Any, **kwargs: Any) -> Any:
+    """Call client.messages.parse with retry on transient errors.
+
+    Wraps the call in a shared api_retry_any instance with production timings.
+    """
+    return _parse_retry(lambda: client.messages.parse(**kwargs))()

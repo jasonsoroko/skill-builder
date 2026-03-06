@@ -17,6 +17,7 @@ from anthropic import Anthropic
 
 from skill_builder.models.brief import SkillBrief
 from skill_builder.models.production import SetupDraft
+from skill_builder.resilience import retry_parse
 from skill_builder.models.synthesis import KnowledgeModel
 from skill_builder.tracing import create_traced_client
 
@@ -64,7 +65,8 @@ class DocumenterAgent:
             brief.name,
         )
 
-        response = self.client.messages.parse(
+        response = retry_parse(
+            self.client,
             model="claude-sonnet-4-6",
             max_tokens=4096,
             output_format=SetupDraft,

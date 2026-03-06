@@ -17,6 +17,7 @@ from typing import Any
 from anthropic import Anthropic
 
 from skill_builder.models.brief import SkillBrief
+from skill_builder.resilience import retry_parse
 from skill_builder.models.synthesis import (
     CategorizedResearch,
     GapReport,
@@ -68,7 +69,8 @@ class LearnerAgent:
             brief.name,
         )
 
-        response = self.client.messages.parse(
+        response = retry_parse(
+            self.client,
             model="claude-sonnet-4-6",
             max_tokens=8192,
             output_format=KnowledgeModel,
